@@ -1,0 +1,11 @@
+# Config file
+# Editing this file might cause weird things
+# if you don't know what you are doing
+
+window_width 512
+window_height 384
+canvas_width 256
+canvas_height 192
+fps 30
+fullscreen 0
+title "Game"

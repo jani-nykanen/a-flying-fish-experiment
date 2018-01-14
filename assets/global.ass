@@ -1,0 +1,16 @@
+# Game assets
+
+# Bitmaps
+@path assets/bitmaps/
+@type bitmap
+{
+    font font.png
+    test test.png
+    crate crate.png
+}
+
+@path assets/models/
+@type mesh
+{
+    cube cube.obj
+}
