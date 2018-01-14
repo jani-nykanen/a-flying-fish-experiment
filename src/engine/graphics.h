@@ -216,5 +216,13 @@ void set_uv(float x1, float y1, float x2, float y2, float x3, float y3);
 /// < m Mesh to drawW
 void draw_mesh(MESH* m);
 
+/// Toggle lighting
+/// < state On/off state
+void toggle_lighting(bool state);
+
+/// Set lighting
+/// < dir Direction
+/// < mag Magnitude
+void set_ligthing(VEC3 dir, float mag);
 
 #endif // __GRAPHICS__

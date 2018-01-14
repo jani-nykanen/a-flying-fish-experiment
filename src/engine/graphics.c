@@ -19,6 +19,7 @@ typedef struct
     VEC2 tA,tB,tC; // Texture coordinates
     BITMAP* tex; // Texture
     float depth; // Depth value
+    bool light; // Light enabled
     VEC3 normal; // Normal
 }
 _TRIANGLE;
@@ -69,6 +70,12 @@ static VEC2 UVtrans;
 static VEC3* usedNormal;
 // Light value
 static int lightVal; 
+// Light enabled
+static bool lightEnabled;
+// Light direction
+static VEC3 lightDir;
+// Light magnitude
+static float lightMag;
 
 // Light palettes
 static Uint8 lpalettes[MAX_DARKNESS_VALUE] [256];
@@ -162,9 +169,8 @@ static int calculate_ligthing_value(VEC3 normal)
 
     normal = tr_rotate_normal(normal);
 
-    VEC3 lightDir = vec3(0,0.0,-1);
     float multiplier = maxf( 0.0f, normal.x*lightDir.x+normal.y*lightDir.y+normal.z*lightDir.z);
-    multiplier = 0.25f + 0.75f * multiplier;
+    multiplier = (1.0f-lightMag) + lightMag * multiplier;
 
     return (int)floor( (1.0f-multiplier) / (1.0f/ ( (float)2*MAX_DARKNESS_VALUE)) );
 }
@@ -216,6 +222,10 @@ void init_graphics()
 
     transX = 0;
     transY = 0;
+
+    lightDir = vec3(0,0,-1);
+    lightMag = 1.0f;
+    lightEnabled = false;
 
     gen_light_palettes();
 }
@@ -824,7 +834,7 @@ void draw_triangle_3d(VEC3 a, VEC3 b, VEC3 c, VEC2 tA, VEC2 tB, VEC2 tC, VEC3 n)
     }
 
     float depth = (ta.z+tb.z+tc.z)/3.0f;
-    tbuffer[tindex] = (_TRIANGLE){ta,tb,tc,tA,tB,tC,gtex, depth, n};
+    tbuffer[tindex] = (_TRIANGLE){ta,tb,tc,tA,tB,tC,gtex, depth,lightEnabled, n};
     tindex ++;
 }
 
@@ -885,7 +895,7 @@ void draw_triangle_buffer()
 
             t = tbuffer[drawIndex];
 
-            ppfunc = put_pixel_dark;
+            ppfunc = lightEnabled ? put_pixel_dark : put_pixel;
             lightVal = calculate_ligthing_value(t.normal);
             bind_texture(t.tex);
             set_uv(t.tA.x,t.tA.y,t.tB.x,t.tB.y,t.tC.x,t.tC.y);
@@ -975,4 +985,19 @@ void draw_mesh(MESH* m)
             vec3(m->normals[m->indices[i]*3],m->normals[m->indices[i]*3 +1],m->normals[m->indices[i]*3+2])
         );
     }
+}
+
+
+/// Toggle lighting
+void toggle_lighting(bool state)
+{
+    lightEnabled = state;
+}
+
+
+/// Set lighting
+void set_ligthing(VEC3 dir, float mag)
+{
+    lightDir = dir;
+    lightMag = mag;
 }

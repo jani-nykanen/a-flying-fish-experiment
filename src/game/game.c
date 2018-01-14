@@ -73,6 +73,10 @@ static void game_draw()
 
     bind_texture(bmpCrate);
 
+
+    toggle_lighting(true);
+    set_ligthing(vec3(0,0,-1),0.75f);
+
     draw_mesh(mCube);
     draw_triangle_buffer();
 
