@@ -22,10 +22,10 @@
 // Bitmap font
 static BITMAP* bmpFont;
 
-// Cube mesh
-static MESH* mCube;
-// Crate texture
-static BITMAP* bmpCrate;
+// Fish mesh
+static MESH* mFish;
+// Fish texture
+static BITMAP* bmpFish;
 
 // Angle
 static float angle;
@@ -39,8 +39,8 @@ static int game_init()
     ASSET_PACK* ass = get_global_assets();
     bmpFont = (BITMAP*)get_asset(ass,"font");
 
-    bmpCrate = (BITMAP*)get_asset(ass,"crate");
-    mCube = (MESH*)get_asset(ass,"cube");
+    bmpFish = (BITMAP*)get_asset(ass,"fish_tex");
+    mFish = (MESH*)get_asset(ass,"fish");
 
     angle = 0.0f;
 
@@ -67,17 +67,17 @@ static void game_draw()
     clear_triangle_buffer();
 
     tr_identity();
-    tr_translate(0.0f,0,3.75f);
-    tr_rotate_model(angle,angle/2,angle);
+    tr_translate(0.0f,0,4.25f);
+    tr_rotate_model(angle/2,angle,angle);
     tr_scale_model(1.0f,1.0f,1.0f);
 
-    bind_texture(bmpCrate);
+    bind_texture(bmpFish);
 
 
     toggle_lighting(true);
     set_ligthing(vec3(0,0,-1),0.75f);
 
-    draw_mesh(mCube);
+    draw_mesh(mFish);
     draw_triangle_buffer();
 
 }

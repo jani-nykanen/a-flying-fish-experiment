@@ -6,11 +6,11 @@
 {
     font font.png
     test test.png
-    crate crate.png
+    fish_tex fish.png
 }
 
 @path assets/models/
 @type mesh
 {
-    cube cube.obj
+    fish fish.obj
 }
