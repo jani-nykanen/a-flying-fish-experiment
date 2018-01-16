@@ -74,7 +74,7 @@ static void game_draw()
     bind_texture(bmpFish);
 
 
-    toggle_lighting(true);
+    toggle_lighting(false);
     set_ligthing(vec3(0,0,-1),0.75f);
 
     draw_mesh(mFish);
