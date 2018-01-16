@@ -17,6 +17,24 @@ static MESH* mFish;
 static BITMAP* bmpFish;
 
 
+// Speed delta
+static void pl_speed_delta(float* speed, float target, float acc, float tm)
+{
+    if(target > *speed)
+    {
+        *speed += acc * tm;
+        if(*speed > target)
+            *speed = target;
+    }
+    else if(target < *speed)
+    {
+        *speed -= acc * tm;
+        if(*speed < target)
+            *speed = target;
+    }
+}
+
+
 // Limit angle
 static void pl_limit_angle(PLAYER* pl)
 {
@@ -57,7 +75,7 @@ static void pl_control(PLAYER* pl)
     }
     else if(fabs(pl->angle.z) > 0.001f)
     {
-        pl->angleTarget.z = -(pl->angle.z / (M_PI/2))* pl->angleMax.z;
+        pl->angleTarget.z = -2* (pl->angle.z / (M_PI/2))* pl->angleMax.z;
     }
     
     if(fabs(stick.y)  > 0.1f)
@@ -66,7 +84,7 @@ static void pl_control(PLAYER* pl)
     }
     else if(fabs(pl->angle.x) > 0.001f)
     {
-        pl->angleTarget.x = -(pl->angle.x / (M_PI/2))* pl->angleMax.x;
+        pl->angleTarget.x = -2* (pl->angle.x / (M_PI/2))* pl->angleMax.x;
     }
 
     pl_limit_angle(pl);
@@ -76,44 +94,9 @@ static void pl_control(PLAYER* pl)
 // Rotate
 static void pl_rotate(PLAYER* pl, float tm)
 {
-    if(pl->angleTarget.x > pl->angleSpeed.x)
-    {
-        pl->angleSpeed.x += pl->angleAcc.x * tm;
-        if(pl->angleSpeed.x > pl->angleTarget.x)
-            pl->angleSpeed.x = pl->angleTarget.x;
-    }
-    else if(pl->angleTarget.x < pl->angleSpeed.x)
-    {
-        pl->angleSpeed.x -= pl->angleAcc.x * tm;
-        if(pl->angleSpeed.x < pl->angleTarget.x)
-            pl->angleSpeed.x = pl->angleTarget.x;
-    }
-
-    if(pl->angleTarget.y > pl->angleSpeed.y)
-    {
-        pl->angleSpeed.y += pl->angleAcc.y * tm;
-        if(pl->angleSpeed.y > pl->angleTarget.y)
-            pl->angleSpeed.y = pl->angleTarget.y;
-    }
-    else if(pl->angleTarget.y < pl->angleSpeed.y)
-    {
-        pl->angleSpeed.y -= pl->angleAcc.y * tm;
-        if(pl->angleSpeed.y < pl->angleTarget.y)
-            pl->angleSpeed.y = pl->angleTarget.y;
-    }
-
-    if(pl->angleTarget.z > pl->angleSpeed.z)
-    {
-        pl->angleSpeed.z += pl->angleAcc.z * tm;
-        if(pl->angleSpeed.z > pl->angleTarget.z)
-            pl->angleSpeed.z = pl->angleTarget.z;
-    }
-    else if(pl->angleTarget.z < pl->angleSpeed.z)
-    {
-        pl->angleSpeed.z -= pl->angleAcc.z * tm;
-        if(pl->angleSpeed.z < pl->angleTarget.z)
-            pl->angleSpeed.z = pl->angleTarget.z;
-    }
+    pl_speed_delta(&pl->angleSpeed.x,pl->angleTarget.x,pl->angleAcc.x,tm);
+    pl_speed_delta(&pl->angleSpeed.y,pl->angleTarget.y,pl->angleAcc.y,tm);
+    pl_speed_delta(&pl->angleSpeed.z,pl->angleTarget.z,pl->angleAcc.z,tm);
 
     pl->angle.x += pl->angleSpeed.x * tm;
     pl->angle.y += pl->angleSpeed.y * tm;
@@ -124,44 +107,9 @@ static void pl_rotate(PLAYER* pl, float tm)
 // Player movement
 static void pl_move(PLAYER* pl, float tm)
 {
-    if(pl->target.x > pl->speed.x)
-    {
-        pl->speed.x += pl->acc.x * tm;
-        if(pl->speed.x > pl->target.x)
-            pl->speed.x = pl->target.x;
-    }
-    else if(pl->target.x < pl->speed.x)
-    {
-        pl->speed.x -= pl->acc.x * tm;
-        if(pl->speed.x < pl->target.x)
-            pl->speed.x = pl->target.x;
-    }
-
-    if(pl->target.y > pl->speed.y)
-    {
-        pl->speed.y += pl->acc.y * tm;
-        if(pl->speed.y > pl->target.y)
-            pl->speed.y = pl->target.y;
-    }
-    else if(pl->target.y < pl->speed.y)
-    {
-        pl->speed.y -= pl->acc.y * tm;
-        if(pl->speed.y < pl->target.y)
-            pl->speed.y = pl->target.y;
-    }
-
-    if(pl->target.z > pl->speed.z)
-    {
-        pl->speed.z += pl->acc.z * tm;
-        if(pl->speed.z > pl->target.z)
-            pl->speed.z = pl->target.z;
-    }
-    else if(pl->target.z < pl->speed.z)
-    {
-        pl->speed.z -= pl->acc.z * tm;
-        if(pl->speed.z < pl->target.z)
-            pl->speed.z = pl->target.z;
-    }
+    pl_speed_delta(&pl->speed.x,pl->target.x,pl->acc.x,tm);
+    pl_speed_delta(&pl->speed.y,pl->target.y,pl->acc.y,tm);
+    pl_speed_delta(&pl->speed.z,pl->target.z,pl->acc.z,tm);
 
     pl->pos.x += pl->speed.x * tm;
     pl->pos.y += pl->speed.y * tm;
