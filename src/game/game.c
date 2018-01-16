@@ -14,6 +14,8 @@
 #include "../vpad.h"
 #include "../global.h"
 
+#include "player.h"
+
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
@@ -33,6 +35,9 @@ static float angle;
 // FPS string
 static char fps[32];
 
+// Game objects
+static PLAYER player;
+
 // Init game
 static int game_init()
 {
@@ -44,6 +49,9 @@ static int game_init()
 
     angle = 0.0f;
 
+    init_player(ass);
+    player = pl_create(vec3(0.0f,0.0f,4.25f));
+
     return 0;
 }
 
@@ -53,6 +61,8 @@ static void game_update(float tm)
 {
     angle += 0.025f * tm;
     snprintf(fps,32,"FPS: %d",(int)round(60.0f / tm));
+
+    pl_update(&player,tm);
 }
 
 
@@ -67,17 +77,12 @@ static void game_draw()
     clear_triangle_buffer();
 
     tr_identity();
-    tr_translate(0.0f,0,4.25f);
-    tr_rotate_model(angle/2,angle,angle);
-    tr_scale_model(1.0f,1.0f,1.0f);
-
-    bind_texture(bmpFish);
-
+    tr_translate(0,1.0f,0.5f);
 
     toggle_lighting(false);
-    set_ligthing(vec3(0,0,-1),0.75f);
+    // set_ligthing(vec3(0,0,-1),0.75f);
 
-    draw_mesh(mFish);
+    pl_draw(&player);
     draw_triangle_buffer();
 
 }
