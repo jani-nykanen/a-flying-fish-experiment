@@ -88,6 +88,9 @@ static void pl_control(PLAYER* pl)
     }
 
     pl_limit_angle(pl);
+
+    pl->target.x = sin(pl->angle.y) * pl->maxSpeed.x;
+    pl->target.z = cos(pl->angle.y) * pl->maxSpeed.z;
 }
 
 

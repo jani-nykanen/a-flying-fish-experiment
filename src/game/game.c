@@ -15,6 +15,7 @@
 #include "../global.h"
 
 #include "player.h"
+#include "camera.h"
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -24,19 +25,12 @@
 // Bitmap font
 static BITMAP* bmpFont;
 
-// Fish mesh
-static MESH* mFish;
-// Fish texture
-static BITMAP* bmpFish;
-
-// Angle
-static float angle;
-
 // FPS string
 static char fps[32];
 
 // Game objects
 static PLAYER player;
+static CAMERA cam;
 
 // Init game
 static int game_init()
@@ -44,13 +38,9 @@ static int game_init()
     ASSET_PACK* ass = get_global_assets();
     bmpFont = (BITMAP*)get_asset(ass,"font");
 
-    bmpFish = (BITMAP*)get_asset(ass,"fish_tex");
-    mFish = (MESH*)get_asset(ass,"fish");
-
-    angle = 0.0f;
-
     init_player(ass);
-    player = pl_create(vec3(0.0f,0.0f,4.25f));
+    player = pl_create(vec3(0.0f,0.0f,0.0f));
+    cam = create_camera(player.pos);
 
     return 0;
 }
@@ -59,10 +49,10 @@ static int game_init()
 // Update game
 static void game_update(float tm)
 {
-    angle += 0.025f * tm;
     snprintf(fps,32,"FPS: %d",(int)round(60.0f / tm));
 
     pl_update(&player,tm);
+    cam_follow_player(&cam,&player,tm);
 }
 
 
@@ -77,7 +67,7 @@ static void game_draw()
     clear_triangle_buffer();
 
     tr_identity();
-    tr_translate(0,1.0f,0.5f);
+    use_camera(&cam);
 
     toggle_lighting(false);
     // set_ligthing(vec3(0,0,-1),0.75f);
