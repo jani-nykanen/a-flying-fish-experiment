@@ -35,18 +35,18 @@ void cam_follow_player(CAMERA* cam, PLAYER* pl, float tm)
     }    
 
     cam->angle.y += (pl->angle.y - cam->angle.y)/24.0f * tm;
+
+
+    cam->vpos.x = cam->pos.x - cos(cam->angle.y - M_PI/2.0f) * cam->dist;
+    cam->vpos.y = cam->pos.y - 1.0f;
+    cam->vpos.z = cam->pos.z + sin(cam->angle.y - M_PI/2.0f) * cam->dist;
 }
 
 
 // Use camera
 void use_camera(CAMERA* cam)
 {
-    VEC3 p = vec3(0,0,0);
 
-    p.x = cam->pos.x - cos(cam->angle.y - M_PI/2.0f) * cam->dist;
-    p.y = cam->pos.y - 1.0f;
-    p.z = cam->pos.z + sin(cam->angle.y - M_PI/2.0f) * cam->dist;
-
-    tr_translate(-p.x,-p.y,-p.z);
+    tr_translate(-cam->vpos.x,-cam->vpos.y,-cam->vpos.z);
     tr_rotate_world(cam->angle.y,cam->angle.x);
 }

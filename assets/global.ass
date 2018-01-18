@@ -4,8 +4,11 @@
 @path assets/bitmaps/
 @type bitmap
 {
-    font font.png
     test test.png
+
+    font font.png
+    
+    grass grass.png
     fish_tex fish.png
 }
 

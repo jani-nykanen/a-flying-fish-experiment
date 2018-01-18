@@ -16,6 +16,7 @@
 
 #include "player.h"
 #include "camera.h"
+#include "stage.h"
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -39,6 +40,8 @@ static int game_init()
     bmpFont = (BITMAP*)get_asset(ass,"font");
 
     init_player(ass);
+    init_stage(ass);
+
     player = pl_create(vec3(0.0f,0.0f,0.0f));
     cam = create_camera(player.pos);
 
@@ -52,6 +55,7 @@ static void game_update(float tm)
     snprintf(fps,32,"FPS: %d",(int)round(60.0f / tm));
 
     pl_update(&player,tm);
+    update_stage(&player,tm);
     cam_follow_player(&cam,&player,tm);
 }
 
@@ -70,17 +74,11 @@ static void game_draw()
     use_camera(&cam);
 
     toggle_lighting(false);
-    // set_ligthing(vec3(0,0,-1),0.75f);
-    
-   
+    draw_stage(&cam);
 
     pl_draw(&player);
 
     tr_identity();
-    use_camera(&cam);
-    draw_triangle_3d(vec3(-10,5,-10),vec3(10,5,-10),vec3(10,5,10),vec2(0,0),vec2(1,0),vec2(1,1),vec3(0,1,0));
-    draw_triangle_3d(vec3(10,5,10),vec3(-10,5,10),vec3(-10,5,-10),vec2(1,1),vec2(0,1),vec2(0,0),vec3(0,1,0));
-
     draw_triangle_buffer();
 
 }

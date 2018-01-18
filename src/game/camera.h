@@ -12,6 +12,7 @@
 typedef struct
 {
     VEC3 pos;
+    VEC3 vpos;
     float dist;
     VEC3 angle;
 }
