@@ -71,8 +71,16 @@ static void game_draw()
 
     toggle_lighting(false);
     // set_ligthing(vec3(0,0,-1),0.75f);
+    
+   
 
     pl_draw(&player);
+
+    tr_identity();
+    use_camera(&cam);
+    draw_triangle_3d(vec3(-10,5,-10),vec3(10,5,-10),vec3(10,5,10),vec2(0,0),vec2(1,0),vec2(1,1),vec3(0,1,0));
+    draw_triangle_3d(vec3(10,5,10),vec3(-10,5,10),vec3(-10,5,-10),vec2(1,1),vec2(0,1),vec2(0,0),vec3(0,1,0));
+
     draw_triangle_buffer();
 
 }

@@ -66,6 +66,7 @@ static void pl_limit_angle(PLAYER* pl)
 static void pl_control(PLAYER* pl)
 {
     pl->angleTarget = vec3(0,0,0);
+    pl->target.y = 0.0f;
 
     VEC2 stick = vpad_get_stick();
     if(fabs(stick.x)  > 0.1f)
@@ -81,6 +82,7 @@ static void pl_control(PLAYER* pl)
     if(fabs(stick.y)  > 0.1f)
     {
         pl->angleTarget.x = stick.y * pl->angleMax.x;
+        pl->target.y = pl->maxSpeed.y * stick.y;
     }
     else if(fabs(pl->angle.x) > 0.001f)
     {
@@ -131,7 +133,7 @@ void init_player(ASSET_PACK* ass)
 // Create
 PLAYER pl_create(VEC3 pos)
 {
-    const float MAX_SPEED = 0.25f;
+    const float MAX_SPEED = 0.1f;
     const float MAX_ANGLE_Y = 0.025f;
     const float MAX_ANGLE_XZ = 0.05f;
     const float ACC = 0.01f;
@@ -169,7 +171,7 @@ void pl_update(PLAYER* pl, float tm)
 void pl_draw(PLAYER* pl)
 {
     tr_translate_model(pl->pos.x,pl->pos.y,pl->pos.z);
-    tr_rotate_model(-M_PI/2+pl->angle.x,M_PI+pl->angle.y,M_PI/2 + pl->angle.z);
+    tr_rotate_model(-M_PI/2+pl->angle.x,M_PI+pl->angle.y,M_PI/2); // - pl->angle.z);
     tr_scale_model(1.0f,1.0f,1.0f);
 
     bind_texture(bmpFish);

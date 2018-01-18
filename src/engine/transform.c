@@ -186,9 +186,11 @@ VEC3 tr_use_transform(VEC3 p)
     p.x = x * msc[1] - z * msc[0];
     p.z = x * msc[0] + z * msc[1] ;
     z = p.z;
+    
     p.y = y * msc[3] - z * msc[2];
     p.z = y * msc[2] + z * msc[3] ;
     x = p.x;
+
     y = p.y;
     p.x = x * msc[5] - y * msc[4];
     p.y = x * msc[4] + y * msc[5] ;
