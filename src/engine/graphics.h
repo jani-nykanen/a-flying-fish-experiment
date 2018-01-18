@@ -225,4 +225,18 @@ void toggle_lighting(bool state);
 /// < mag Magnitude
 void set_ligthing(VEC3 dir, float mag);
 
+/// Toggle darkness
+/// < state On/off state
+void toggle_darkness(bool state);
+
+/// Set darkness
+/// < min Minimum
+/// < max Maximum
+void set_darkness(float min, float max);
+
+/// Set near/far plane
+/// < near Near
+/// < far Far
+void set_near_far_planes(float near, float far);
+
 #endif // __GRAPHICS__

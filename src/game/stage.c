@@ -45,8 +45,8 @@ static void draw_floor_tile(float x, float y, float z, float w, float h, int sub
 // Draw floor
 static void draw_floor(CAMERA* cam, float y)
 {
-    const float TILE_SIZE = 5.0f;
-    const int TILE_COUNT = 10;
+    const float TILE_SIZE = 10.0f;
+    const int TILE_COUNT = 8;
 
     int x = (int)floor(cam->pos.x / TILE_SIZE);
     int z = (int)floor(cam->pos.z / TILE_SIZE);
@@ -60,17 +60,26 @@ static void draw_floor(CAMERA* cam, float y)
     int stepz = 1;
     int subdivide = 1;
 
+    int tcount = 0;
+
     int dx, dz;
     for(dz = sz; dz <= ez; dz += stepz)
     {
         for(dx = sx; dx <= ex; dx += stepx)
         {
             subdivide = 1;
-            if(dx >= sx + TILE_COUNT/2 - 1 && dx <= ex - TILE_COUNT/2 + 1
-            && dz >= sz + TILE_COUNT/2 - 1 && dz <= ez - TILE_COUNT/2 + 1) 
+
+            if(dx >= sx + TILE_COUNT/2 - 2 && dx <= ex - TILE_COUNT/2 + 2
+            && dz >= sz + TILE_COUNT/2 - 2 && dz <= ez - TILE_COUNT/2 + 2) 
                 subdivide = 2;
 
+            if(dx >= sx + TILE_COUNT/2 - 1 && dx <= ex - TILE_COUNT/2 + 1
+            && dz >= sz + TILE_COUNT/2 - 1 && dz <= ez - TILE_COUNT/2 + 1) 
+                subdivide = 4;
+
             draw_floor_tile(dx * TILE_SIZE,y, dz * TILE_SIZE, TILE_SIZE, TILE_SIZE,subdivide);
+
+            tcount += subdivide*subdivide;
         }
     }
 }

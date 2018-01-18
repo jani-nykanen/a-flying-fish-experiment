@@ -63,9 +63,11 @@ static void game_update(float tm)
 // Draw game
 static void game_draw()
 {
-    clear_frame(0b10110110);
+    set_near_far_planes(0.025f,35.0f);
+
+    clear_frame(0);
     
-    draw_bitmap((BITMAP*)get_asset(get_global_assets(),"test"),0,0,0);
+    // draw_bitmap((BITMAP*)get_asset(get_global_assets(),"test"),0,0,0);
     draw_text(bmpFont,(Uint8*)fps,32,8,8,-1,0,false);
 
     clear_triangle_buffer();
@@ -74,7 +76,11 @@ static void game_draw()
     use_camera(&cam);
 
     toggle_lighting(false);
+
+    toggle_darkness(true);
+    set_darkness(10.0f,35.0f);
     draw_stage(&cam);
+    toggle_darkness(false);
 
     pl_draw(&player);
 

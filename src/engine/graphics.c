@@ -20,6 +20,7 @@ typedef struct
     BITMAP* tex; // Texture
     float depth; // Depth value
     bool light; // Light enabled
+    bool darkness; // Darkness enabled
     VEC3 normal; // Normal
 }
 _TRIANGLE;
@@ -27,8 +28,10 @@ _TRIANGLE;
 // Max darkness value
 #define MAX_DARKNESS_VALUE 8
 
-// Min depth
+// Min depth (default for near plane)
 static const float DEPTH_MIN = 0.025f;
+// Max depth (default for far plane)
+static const float DEPTH_MAX = 100.0f;
 
 // Size of triangle buffer
 #define TBUFFER_SIZE 1024
@@ -76,6 +79,27 @@ static bool lightEnabled;
 static VEC3 lightDir;
 // Light magnitude
 static float lightMag;
+
+// Is darkness enabled
+static bool darknessEnabled;
+// Darkness begin
+static float darkBegin;
+// Darkness end
+static float darkEnd;
+
+// Depth min
+static float depthMin;
+// Depth max
+static float depthMax;
+// Depth step
+static float depthStep;
+// Depth direction
+static int depthDirection;
+
+// Near plane
+static float nearPlane;
+// Far plane
+static float farPlane;
 
 // Light palettes
 static Uint8 lpalettes[MAX_DARKNESS_VALUE] [256];
@@ -226,6 +250,10 @@ void init_graphics()
     lightDir = vec3(0,0,-1);
     lightMag = 1.0f;
     lightEnabled = false;
+    darknessEnabled = false;
+
+    nearPlane = DEPTH_MIN;
+    farPlane = DEPTH_MAX;
 
     gen_light_palettes();
 }
@@ -641,6 +669,8 @@ void draw_line(int x1, int y1, int x2, int y2, Uint8 color)
 // Draw a textured triangle
 static void _draw_triangle(int x1, int y1, int x2, int y2, int x3, int y3, int spc)
 {
+    int dmodif = 0;
+
     BITMAP* b = gtex;
 
     // Calculate minimums & maximums
@@ -707,9 +737,30 @@ static void _draw_triangle(int x1, int y1, int x2, int y2, int x3, int y3, int s
     // Translated coordinates
     int xx, yy;
 
+    float depth = 0.0f;
+    float dstep = 0.0f;
+    if(darknessEnabled)
+    {
+        depth = depthDirection == 1 ? depthMin : depthMax;
+        dstep = depthStep / (float) (maxy-miny);
+    }
+
     // Draw visible pixels
     for(y = miny; y <= min(maxy,gframe->h); y++)
     {
+        if(darknessEnabled)
+        {
+            if(depth >= darkBegin)
+            {
+                lightVal = dmodif + floor( (2*MAX_DARKNESS_VALUE) * (depth - darkBegin) / (darkEnd-darkBegin) ) ;
+                if(lightVal > MAX_DARKNESS_VALUE*2-2) lightVal = MAX_DARKNESS_VALUE*2-2;
+            }
+            else
+            {
+                lightVal = dmodif;
+            }
+        }
+
         if(y >= 0)
         {
             for(x = max(0,(int)startx); x <= min(gframe->w,(int)endx); ++ x)
@@ -753,6 +804,8 @@ static void _draw_triangle(int x1, int y1, int x2, int y2, int x3, int y3, int s
             _draw_triangle(x1,y1,x2,y2,x3,y3,spc+1);
             return;
         }
+
+         depth += dstep; 
     }
 }
 // Draw a textured triangle (actual definition)
@@ -815,6 +868,12 @@ void draw_triangle_3d(VEC3 a, VEC3 b, VEC3 c, VEC2 tA, VEC2 tB, VEC2 tC, VEC3 n)
     if(tc.z < DEPTH_MIN)
         tc.z = DEPTH_MIN;
 
+    if(darknessEnabled)
+    {
+        if(ta.z > farPlane && tb.z > farPlane && tc.z > farPlane) 
+            return;
+    }
+
     ta.x /= ta.z; ta.y /= ta.z;
     tb.x /= tb.z; tb.y /= tb.z;
     tc.x /= tc.z; tc.y /= tc.z;
@@ -834,7 +893,7 @@ void draw_triangle_3d(VEC3 a, VEC3 b, VEC3 c, VEC2 tA, VEC2 tB, VEC2 tC, VEC3 n)
     }
 
     float depth = (ta.z+tb.z+tc.z)/3.0f;
-    tbuffer[tindex] = (_TRIANGLE){ta,tb,tc,tA,tB,tC,gtex, depth,lightEnabled, n};
+    tbuffer[tindex] = (_TRIANGLE){ta,tb,tc,tA,tB,tC,gtex, depth,lightEnabled,darknessEnabled, n};
     tindex ++;
 }
 
@@ -895,7 +954,32 @@ void draw_triangle_buffer()
 
             t = tbuffer[drawIndex];
 
-            ppfunc = lightEnabled ? put_pixel_dark : put_pixel;
+            darknessEnabled = t.darkness;
+            if(darknessEnabled)
+            {
+                depthMin = minf(t.A.z,minf(t.B.z,t.C.z));
+                depthMax = maxf(t.A.z,maxf(t.B.z,t.C.z));
+                depthStep = fabs(depthMax - depthMin);
+                depthDirection = 1;
+
+                float miny = minf(t.A.y,minf(t.B.y,t.C.y));
+                if(fabs(miny-t.A.y) < 0.001f)
+                {
+                    depthDirection = (t.A.z <= depthMin) ? 1 : -1;        
+                }
+                else if(fabs(miny-t.B.y) < 0.001f)
+                {
+                    depthDirection = (t.B.z <= depthMin) ? 1 : -1;        
+                }
+                else if(fabs(miny-t.C.y) < 0.001f)
+                {
+                    depthDirection = (t.C.z <= depthMin) ? 1 : -1;   
+                }
+
+                depthStep *= depthDirection;
+            }
+
+            ppfunc = (lightEnabled || darknessEnabled) ? put_pixel_dark : put_pixel;
             lightVal = calculate_ligthing_value(t.normal);
             bind_texture(t.tex);
             set_uv(t.tA.x,t.tA.y,t.tB.x,t.tB.y,t.tC.x,t.tC.y);
@@ -906,6 +990,7 @@ void draw_triangle_buffer()
     }
     usedNormal = NULL;
     lightVal = 0;
+    darknessEnabled = false;
     ppfunc = put_pixel;
     
 }
@@ -1000,4 +1085,26 @@ void set_ligthing(VEC3 dir, float mag)
 {
     lightDir = dir;
     lightMag = mag;
+}
+
+
+// Toggle darkness
+void toggle_darkness(bool state)
+{
+    darknessEnabled = state;
+}
+
+// Set darkness
+void set_darkness(float min, float max)
+{
+    darkBegin = min;
+    darkEnd = max;
+}
+
+
+// Set near/far plane
+void set_near_far_planes(float near, float far)
+{
+    nearPlane = near;
+    farPlane = far;
 }
