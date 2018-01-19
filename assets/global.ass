@@ -9,6 +9,9 @@
     font font.png
     
     grass grass.png
+    forest forest.png
+    mountains mountains.png
+    moon moon.png
     fish_tex fish.png
 }
 

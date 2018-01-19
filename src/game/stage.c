@@ -8,6 +8,12 @@
 
 // Grass texture
 static BITMAP* bmpGrass;
+// Forest texture
+static BITMAP* bmpForest;
+// Mountains texture
+static BITMAP* bmpMountains;
+// Moon texture
+static BITMAP* bmpMoon;
 
 
 // Draw a floor tile (or piece of it)
@@ -85,10 +91,42 @@ static void draw_floor(CAMERA* cam, float y)
 }
 
 
+// Draw forest
+static void draw_forest(CAMERA* cam)
+{
+    clear_frame(0);
+    int w = bmpForest->w;
+
+    int y = 80 - (int)(cam->pos.y*3);
+    
+    float angle = cam->angle.y;
+    while(angle >= M_PI*2) angle -= M_PI*2;
+    while(angle < 0) angle += M_PI*2;
+
+    int posx = -(int)(angle/(2*M_PI) * 1024);
+
+    int i = 0;
+
+    for(; i < 3; ++ i)
+    {
+        draw_bitmap(bmpMountains,posx + i*bmpMountains->w,0,0);
+    }
+
+    for(i = 0; i < 6; ++ i)
+    {
+        draw_bitmap(bmpForest,posx + i*w,y,0);
+    }
+
+}
+
+
 // Initialize stage
 void init_stage(ASSET_PACK* ass)
 {
     bmpGrass = (BITMAP*)get_asset(ass,"grass");
+    bmpForest = (BITMAP*)get_asset(ass,"forest");
+    bmpMountains = (BITMAP*)get_asset(ass,"mountains");
+    bmpMoon = (BITMAP*)get_asset(ass,"moon");
 }
 
 
@@ -102,5 +140,6 @@ void update_stage(PLAYER* pl, float tm)
 // Draw the stage
 void draw_stage(CAMERA* cam)
 {
+    draw_forest(cam);
     draw_floor(cam,5);
 }

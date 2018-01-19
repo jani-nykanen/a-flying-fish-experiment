@@ -328,11 +328,25 @@ void draw_bitmap(BITMAP* b, int dx, int dy, int flip)
     int px = 0; // Pixel X
     int py = 0; // Pixel Y
 
+    if(dx+b->w < 0 || dx >= gframe->w || dy + b->h < 0 || dy >= gframe->h) return;
+
     // Go though every pixel and put them to a frame
     for(; y < dy+b->h; y++)
     {
-        for(x = dx; x < dx+b->w; x++)
+        if(y < 0)
         {
+            ++ py;
+            continue;
+        }
+
+        for(x = dx; x < min(gframe->w,dx+b->w); x++)
+        {
+            if(x < 0)
+            {
+                ++ px;
+                continue;
+            }
+
             ppfunc(x,y, (b->data[py*b->w +px]));
             px ++;
         }

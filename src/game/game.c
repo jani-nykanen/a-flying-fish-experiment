@@ -65,7 +65,7 @@ static void game_draw()
 {
     set_near_far_planes(0.025f,35.0f);
 
-    clear_frame(0);
+    clear_frame(0b10100010);
     
     // draw_bitmap((BITMAP*)get_asset(get_global_assets(),"test"),0,0,0);
     draw_text(bmpFont,(Uint8*)fps,32,8,8,-1,0,false);
