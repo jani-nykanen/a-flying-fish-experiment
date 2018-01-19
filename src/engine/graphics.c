@@ -163,7 +163,7 @@ static void put_pixel(int x, int y, Uint8 index)
 /// < index Color index
 static void put_pixel_dark(int x, int y, Uint8 index)
 {
-    if(index == 255 || x < 0 || y < 0 || x >= gframe->w || y >= gframe->h) return;
+    if(index == alpha || x < 0 || y < 0 || x >= gframe->w || y >= gframe->h) return;
 
     if(lightVal > 0)
     {
@@ -459,6 +459,8 @@ void draw_bitmap_region(BITMAP* b, int sx, int sy, int sw, int sh, int dx, int d
     dx += transX;
     dy += transY;
 
+    if(dx+sw < 0 || dx >= gframe->w || dy + sh < 0 || dy >= sh) return;
+
     int x; // Screen X
     int y = dy; // Screen Y
     int px = sx; // Pixel X
@@ -469,10 +471,29 @@ void draw_bitmap_region(BITMAP* b, int sx, int sy, int sw, int sh, int dx, int d
     int stepx = flip == FLIP_NONE ? 1 : -1;
 
     // Go though every pixel and put them to a frame
-    for(; y < dy+sh; y++)
+    for(; y < min(gframe->h,dy+sh); y++)
     {
+        if(y < 0)
+        {
+            ++ py;
+            continue;
+        }
+
         for(x = beginx; x != endx; x += stepx)
         {
+            if(stepx > 0)
+            {
+                if( x < 0)
+                {
+                    ++ px;
+                    continue;
+                }
+                else if(x >= gframe->w)
+                {
+                    break;
+                }
+            }
+
             ppfunc(x,y, b->data[py*b->w +px]);
 
             px ++;
@@ -870,23 +891,20 @@ void draw_triangle_3d(VEC3 a, VEC3 b, VEC3 c, VEC2 tA, VEC2 tB, VEC2 tC, VEC3 n)
     VEC3 tb = tr_use_transform(b);
     VEC3 tc = tr_use_transform(c);
 
-    if(ta.z < DEPTH_MIN && tb.z < DEPTH_MIN && tc.z < DEPTH_MIN)
+    if(ta.z < nearPlane && tb.z < nearPlane && tc.z < nearPlane)
         return;
 
-    if(ta.z < DEPTH_MIN)
-        ta.z = DEPTH_MIN;
+    if(ta.z < nearPlane)
+        ta.z = nearPlane;
 
-    if(tb.z < DEPTH_MIN)
-        tb.z = DEPTH_MIN;
+    if(tb.z < nearPlane)
+        tb.z = nearPlane;
         
-    if(tc.z < DEPTH_MIN)
-        tc.z = DEPTH_MIN;
+    if(tc.z < nearPlane)
+        tc.z = nearPlane;
 
-    if(darknessEnabled)
-    {
-        if(ta.z > farPlane && tb.z > farPlane && tc.z > farPlane) 
-            return;
-    }
+    if(ta.z > farPlane && tb.z > farPlane && tc.z > farPlane) 
+        return;
 
     ta.x /= ta.z; ta.y /= ta.z;
     tb.x /= tb.z; tb.y /= tb.z;

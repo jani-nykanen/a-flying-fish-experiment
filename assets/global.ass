@@ -13,6 +13,7 @@
     mountains mountains.png
     moon moon.png
     fish_tex fish.png
+    fence fence.png
 }
 
 @path assets/models/

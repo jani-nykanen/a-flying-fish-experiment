@@ -14,6 +14,8 @@ static BITMAP* bmpForest;
 static BITMAP* bmpMountains;
 // Moon texture
 static BITMAP* bmpMoon;
+// Fence texture
+static BITMAP* bmpFence;
 
 
 // Draw a floor tile (or piece of it)
@@ -91,8 +93,8 @@ static void draw_floor(CAMERA* cam, float y)
 }
 
 
-// Draw forest
-static void draw_forest(CAMERA* cam)
+// Draw background
+static void draw_background(CAMERA* cam)
 {
     clear_frame(0);
     int w = bmpForest->w;
@@ -107,18 +109,121 @@ static void draw_forest(CAMERA* cam)
 
     int i = 0;
 
+    // Mountains
     for(; i < 3; ++ i)
     {
         draw_bitmap(bmpMountains,posx + i*bmpMountains->w,0,0);
     }
 
+    // Forest
     for(i = 0; i < 6; ++ i)
     {
         draw_bitmap(bmpForest,posx + i*w,y,0);
     }
 
+    // Draw moon
+    if(posx > -512)
+    {
+        draw_bitmap(bmpMoon,480+posx,10,0);
+    }
+
 }
 
+
+// Draw horizontal fence plane
+static void draw_fence_plane_h(CAMERA* cam, float x,float y,float z, float w, float h)
+{
+    float dist = hypot(cam->vpos.x-(x+w/2),cam->vpos.z-z);
+
+    int subdivide = 1;
+    if(dist < 4*w) subdivide = 2;
+    if(dist < 2*w) subdivide = 4;
+
+    int dx = 0, dy = 0;
+    float stepw = w / subdivide;
+    float steph = h / subdivide;
+    float stepuv = 1.0 / subdivide;
+
+    float tx, ty, tz;
+    float u,v;
+
+    for(dx = 0; dx < subdivide; ++ dx)
+    {
+        for(dy = 0; dy < subdivide; ++ dy)
+        {
+            tx = x + stepw*dx;
+            ty = y + steph*dy;
+            tz = z;
+                
+            u = stepuv*dx;
+            v = stepuv*dy;
+
+            draw_triangle_3d(vec3(tx,ty,tz),vec3(tx+stepw,ty,tz),vec3(tx+stepw,ty+steph,tz),
+                vec2(u,v),vec2(u+stepuv,v),vec2(u+stepuv,v+stepuv),vec3(0,0,1));
+
+            draw_triangle_3d(vec3(tx+stepw,ty+steph,tz),vec3(tx,ty+steph,tz),vec3(tx,ty,tz),
+                vec2(u+stepuv,v+stepuv),vec2(u,v+stepuv),vec2(u,v),vec3(0,0,1));
+        }
+    }
+}
+
+
+// Draw depth-direction fence plane
+static void draw_fence_plane_d(CAMERA* cam, float x,float y,float z, float w, float h)
+{
+
+    float dist = hypot(cam->vpos.x-x,cam->vpos.z-(z+w/2));
+
+    int subdivide = 1;
+    if(dist < 4*w) subdivide = 2;
+    if(dist < 2*w) subdivide = 4;
+
+    int dx = 0, dy = 0;
+    float stepw = w / subdivide;
+    float steph = h / subdivide;
+
+    float stepuv = 1.0 / subdivide;
+
+    float tx, ty, tz;
+    float u,v;
+
+    for(dx = 0; dx < subdivide; ++ dx)
+    {
+        for(dy = 0; dy < subdivide; ++ dy)
+        {
+            tx = x;
+            ty = y+steph*dy;
+            tz = z+stepw*dx;
+                
+            u = stepuv*dx;
+            v = stepuv*dy;
+
+            draw_triangle_3d(vec3(tx,ty,tz),vec3(tx,ty,tz+stepw),vec3(tx,ty+steph,tz+stepw),
+                vec2(u,v),vec2(u+stepuv,v),vec2(u+stepuv,v+stepuv),vec3(0,0,1));
+
+            draw_triangle_3d(vec3(tx,ty+steph,tz+stepw),vec3(tx,ty+steph,tz),vec3(tx,ty,tz),
+                vec2(u+stepuv,v+stepuv),vec2(u,v+stepuv),vec2(u,v),vec3(0,0,1));
+        }
+    }
+}
+
+
+
+// Draw fence
+static void draw_fence(CAMERA* cam, float x, float y, float z, float w, float h, float d, int repeat)
+{
+    bind_texture(bmpFence);
+    int i = 0;
+
+    for(; i < repeat; ++ i)
+    {
+        draw_fence_plane_h(cam,x + i*w,y-h,z,w,h);
+        draw_fence_plane_h(cam,x + i*w,y-h,z + d * repeat,w,h);
+
+        draw_fence_plane_d(cam,x,y-h,z + i*d,d,h);
+        draw_fence_plane_d(cam,x + w*repeat,y-h,z + i*d,d,h);
+    }
+}
 
 // Initialize stage
 void init_stage(ASSET_PACK* ass)
@@ -127,6 +232,7 @@ void init_stage(ASSET_PACK* ass)
     bmpForest = (BITMAP*)get_asset(ass,"forest");
     bmpMountains = (BITMAP*)get_asset(ass,"mountains");
     bmpMoon = (BITMAP*)get_asset(ass,"moon");
+    bmpFence = (BITMAP*)get_asset(ass,"fence");
 }
 
 
@@ -140,6 +246,7 @@ void update_stage(PLAYER* pl, float tm)
 // Draw the stage
 void draw_stage(CAMERA* cam)
 {
-    draw_forest(cam);
+    draw_background(cam);
     draw_floor(cam,5);
+    draw_fence(cam,-25,5,-25,5.0f,5.0f,5.0f,10);
 }
