@@ -66,9 +66,6 @@ static void game_draw()
     set_near_far_planes(0.025f,35.0f);
 
     clear_frame(0b10100010);
-    
-    // draw_bitmap((BITMAP*)get_asset(get_global_assets(),"test"),0,0,0);
-    draw_text(bmpFont,(Uint8*)fps,32,8,8,-1,0,false);
 
     clear_triangle_buffer();
 
@@ -77,8 +74,7 @@ static void game_draw()
 
     toggle_lighting(false);
 
-    toggle_darkness(true);
-    set_darkness(10.0f,35.0f);
+
     draw_stage(&cam);
     toggle_darkness(false);
 
@@ -86,6 +82,8 @@ static void game_draw()
 
     tr_identity();
     draw_triangle_buffer();
+
+    draw_text(bmpFont,(Uint8*)fps,32,8,8,-1,0,false);
 
 }
 

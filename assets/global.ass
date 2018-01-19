@@ -14,10 +14,14 @@
     moon moon.png
     fish_tex fish.png
     fence fence.png
+    house_tex house.png
+    fir_tex fir.png
 }
 
 @path assets/models/
 @type mesh
 {
     fish fish.obj
+    house house.obj
+    fir fir.obj
 }

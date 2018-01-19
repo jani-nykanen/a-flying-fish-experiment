@@ -16,6 +16,15 @@ static BITMAP* bmpMountains;
 static BITMAP* bmpMoon;
 // Fence texture
 static BITMAP* bmpFence;
+// House texture
+static BITMAP* bmpHouse;
+// Fir texture
+static BITMAP* bmpFir;
+
+// House model
+static MESH* mHouse;
+// Fir model
+static MESH* mFir;
 
 
 // Draw a floor tile (or piece of it)
@@ -225,6 +234,32 @@ static void draw_fence(CAMERA* cam, float x, float y, float z, float w, float h,
     }
 }
 
+
+// Draw a fir
+static void draw_fir(float x, float z, float h)
+{
+    tr_scale_model(4,h,4);
+    tr_translate_model(x,4.9f,z);
+
+    bind_texture(bmpFir);
+    draw_mesh(mFir);
+}
+
+
+// Draw various models
+static void draw_models()
+{
+    tr_scale_model(5,6,5);
+    tr_translate_model(17.5,3.3f,4.0f);
+
+    bind_texture(bmpHouse);
+    draw_mesh(mHouse);
+
+    draw_fir(15,-12,6);
+    draw_fir(4,14,5.5f);
+}
+
+
 // Initialize stage
 void init_stage(ASSET_PACK* ass)
 {
@@ -233,6 +268,11 @@ void init_stage(ASSET_PACK* ass)
     bmpMountains = (BITMAP*)get_asset(ass,"mountains");
     bmpMoon = (BITMAP*)get_asset(ass,"moon");
     bmpFence = (BITMAP*)get_asset(ass,"fence");
+    bmpHouse = (BITMAP*)get_asset(ass,"house_tex");
+    bmpFir = (BITMAP*)get_asset(ass,"fir_tex");
+
+    mHouse = (MESH*)get_asset(ass,"house");
+    mFir = (MESH*)get_asset(ass,"fir");
 }
 
 
@@ -247,6 +287,19 @@ void update_stage(PLAYER* pl, float tm)
 void draw_stage(CAMERA* cam)
 {
     draw_background(cam);
+
+    toggle_darkness(true);
+    set_darkness(10.0f,35.0f);
+
     draw_floor(cam,5);
+
+    draw_triangle_buffer();
+    clear_triangle_buffer();
+
+    toggle_darkness(true);
+    set_darkness(10.0f,35.0f);
+
     draw_fence(cam,-25,5,-25,5.0f,5.0f,5.0f,10);
+
+    draw_models();
 }
