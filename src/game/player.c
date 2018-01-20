@@ -17,6 +17,28 @@ static MESH* mFish;
 static BITMAP* bmpFish;
 
 
+// Limit player area
+static void pl_limit(PLAYER* pl)
+{
+    const float UPPER_LIMIT = 9.0f;
+    const float LOWER_LIMIT = -4.0f;
+
+    if(pl->speed.y < 0.0f && pl->pos.y < -UPPER_LIMIT)
+    {
+        pl->pos.y = -UPPER_LIMIT;
+        pl->angleTarget.x = 0.0f;
+        pl->speed.y = 0.0f;
+    }
+    else if(pl->speed.y > 0.0f && pl->pos.y > -LOWER_LIMIT)
+    {
+        pl->pos.y = -LOWER_LIMIT;
+        pl->angleTarget.x = 0.0f;
+        pl->speed.y = 0.0f;
+    }
+
+}
+
+
 // Speed delta
 static void pl_speed_delta(float* speed, float target, float acc, float tm)
 {
@@ -162,6 +184,7 @@ PLAYER pl_create(VEC3 pos)
 void pl_update(PLAYER* pl, float tm)
 {
     pl_control(pl);
+    pl_limit(pl);
     pl_move(pl,tm);
     pl_rotate(pl,tm);
 }

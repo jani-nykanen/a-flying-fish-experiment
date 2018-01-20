@@ -4,11 +4,11 @@
 @path assets/bitmaps/
 @type bitmap
 {
-    test test.png
-
     font font.png
     
     grass grass.png
+    road road.png
+
     forest forest.png
     mountains mountains.png
     moon moon.png

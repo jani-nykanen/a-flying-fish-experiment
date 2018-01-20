@@ -3,11 +3,15 @@
 
 #include "stage.h"
 
+#include "decoration.h"
+
 #include "../engine/graphics.h"
 #include "../engine/transform.h"
 
 // Grass texture
 static BITMAP* bmpGrass;
+// Road texture
+static BITMAP* bmpRoad;
 // Forest texture
 static BITMAP* bmpForest;
 // Mountains texture
@@ -26,11 +30,17 @@ static MESH* mHouse;
 // Fir model
 static MESH* mFir;
 
+// Maximum amount of decorations
+#define DEC_MAX 32
+// Decorations
+static DECORATION decorations[DEC_MAX];
+// Decoration count
+static int decCount;
+
 
 // Draw a floor tile (or piece of it)
 static void draw_floor_tile_small(float x, float y, float z, float w, float h, float u, float v, float uw, float vh)
 {
-    bind_texture(bmpGrass);
 
     draw_triangle_3d(vec3(x,y,z),vec3(x+w,y,z),vec3(x+w,y,z+h),
         vec2(u,v),vec2(u+uw,v),vec2(u+uw,v+vh),vec3(0,1,0));
@@ -62,6 +72,8 @@ static void draw_floor_tile(float x, float y, float z, float w, float h, int sub
 // Draw floor
 static void draw_floor(CAMERA* cam, float y)
 {
+    bind_texture(bmpGrass);
+
     const float TILE_SIZE = 10.0f;
     const int TILE_COUNT = 8;
 
@@ -84,6 +96,8 @@ static void draw_floor(CAMERA* cam, float y)
     {
         for(dx = sx; dx <= ex; dx += stepx)
         {
+            bind_texture(dx == 0 ? bmpRoad : bmpGrass);
+
             subdivide = 1;
 
             if(dx >= sx + TILE_COUNT/2 - 2 && dx <= ex - TILE_COUNT/2 + 2
@@ -226,8 +240,11 @@ static void draw_fence(CAMERA* cam, float x, float y, float z, float w, float h,
 
     for(; i < repeat; ++ i)
     {
-        draw_fence_plane_h(cam,x + i*w,y-h,z,w,h);
-        draw_fence_plane_h(cam,x + i*w,y-h,z + d * repeat,w,h);
+        if(i != 5 && i != 6)
+        {
+            draw_fence_plane_h(cam,x + i*w,y-h,z,w,h);
+            draw_fence_plane_h(cam,x + i*w,y-h,z + d * repeat,w,h);
+        }
 
         draw_fence_plane_d(cam,x,y-h,z + i*d,d,h);
         draw_fence_plane_d(cam,x + w*repeat,y-h,z + i*d,d,h);
@@ -256,7 +273,7 @@ static void draw_models()
     draw_mesh(mHouse);
 
     draw_fir(15,-12,6);
-    draw_fir(4,14,5.5f);
+    draw_fir(-4,14,5.5f);
 }
 
 
@@ -264,6 +281,7 @@ static void draw_models()
 void init_stage(ASSET_PACK* ass)
 {
     bmpGrass = (BITMAP*)get_asset(ass,"grass");
+    bmpRoad = (BITMAP*)get_asset(ass,"road");
     bmpForest = (BITMAP*)get_asset(ass,"forest");
     bmpMountains = (BITMAP*)get_asset(ass,"mountains");
     bmpMoon = (BITMAP*)get_asset(ass,"moon");
