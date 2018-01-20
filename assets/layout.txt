@@ -8,7 +8,7 @@ mesh fir
     scale 4 6 4
     add
 
-    pos -4 4.9 14
+    pos -4 4.9 17
     scale -4 6 4
     add
 }
@@ -17,7 +17,34 @@ mesh house
 {
     tex house_tex
 
-    pos 17.5 3.3 4.0
+    pos 17.5 3.1 4.0
     scale 5 6 5
+    add
+}
+
+mesh doghouse
+{
+    tex dogh_tex
+    
+    pos 13.5 4.85 16.0
+    scale -1.8 1.8 -1.8
+    add
+}
+
+mesh pyramid
+{
+    tex pyramid_tex
+
+    pos -14.5 4.8 15.0
+    scale -6 8 6
+    add
+}
+
+mesh bus
+{
+    tex bus_tex
+    
+    pos 4.0 5.1 -15.0
+    scale -3 3 3
     add
 }

@@ -16,6 +16,9 @@
     fence fence.png
     house_tex house.png
     fir_tex fir.png
+    dogh_tex dog_house.png
+    pyramid_tex pyramid.png
+    bus_tex bus.png
 }
 
 @path assets/models/
@@ -24,4 +27,7 @@
     fish fish.obj
     house house.obj
     fir fir.obj
+    doghouse dog_house.obj
+    pyramid pyramid.obj
+    bus bus.obj
 }

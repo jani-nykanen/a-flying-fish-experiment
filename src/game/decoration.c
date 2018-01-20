@@ -34,11 +34,11 @@ void draw_decoration(DECORATION* d)
 // Read decorations from a layout file
 int read_decoration_from_layout(ASSET_PACK* ass, WORDDATA* wd, DECORATION* dec)
 {
-    MESH* m;
-    BITMAP* bmp;
-    VEC3 pos;
-    VEC3 scale;
-    char* w;
+    MESH* m = NULL;
+    BITMAP* bmp = NULL;
+    VEC3 pos =  vec3(0,0,0);
+    VEC3 scale = vec3(1,1,1);
+    char* w = NULL;
 
     int decCount = 0;
 
