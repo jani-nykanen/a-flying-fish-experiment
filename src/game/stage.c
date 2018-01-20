@@ -20,15 +20,6 @@ static BITMAP* bmpMountains;
 static BITMAP* bmpMoon;
 // Fence texture
 static BITMAP* bmpFence;
-// House texture
-static BITMAP* bmpHouse;
-// Fir texture
-static BITMAP* bmpFir;
-
-// House model
-static MESH* mHouse;
-// Fir model
-static MESH* mFir;
 
 // Maximum amount of decorations
 #define DEC_MAX 32
@@ -252,33 +243,19 @@ static void draw_fence(CAMERA* cam, float x, float y, float z, float w, float h,
 }
 
 
-// Draw a fir
-static void draw_fir(float x, float z, float h)
-{
-    tr_scale_model(4,h,4);
-    tr_translate_model(x,4.9f,z);
-
-    bind_texture(bmpFir);
-    draw_mesh(mFir);
-}
-
-
 // Draw various models
 static void draw_models()
 {
-    tr_scale_model(5,6,5);
-    tr_translate_model(17.5,3.3f,4.0f);
-
-    bind_texture(bmpHouse);
-    draw_mesh(mHouse);
-
-    draw_fir(15,-12,6);
-    draw_fir(-4,14,5.5f);
+    int i = 0;
+    for(; i < decCount; ++ i)
+    {
+        draw_decoration(&decorations[i]);
+    }
 }
 
 
 // Initialize stage
-void init_stage(ASSET_PACK* ass)
+int init_stage(ASSET_PACK* ass)
 {
     bmpGrass = (BITMAP*)get_asset(ass,"grass");
     bmpRoad = (BITMAP*)get_asset(ass,"road");
@@ -286,11 +263,15 @@ void init_stage(ASSET_PACK* ass)
     bmpMountains = (BITMAP*)get_asset(ass,"mountains");
     bmpMoon = (BITMAP*)get_asset(ass,"moon");
     bmpFence = (BITMAP*)get_asset(ass,"fence");
-    bmpHouse = (BITMAP*)get_asset(ass,"house_tex");
-    bmpFir = (BITMAP*)get_asset(ass,"fir_tex");
 
-    mHouse = (MESH*)get_asset(ass,"house");
-    mFir = (MESH*)get_asset(ass,"fir");
+    // Read layout file
+    WORDDATA* layout = parse_file("assets/layout.txt");
+    if(layout == NULL)
+        return 1;
+
+    decCount = read_decoration_from_layout(ass,layout,decorations);
+
+    return 0;
 }
 
 

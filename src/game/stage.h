@@ -11,7 +11,7 @@
 
 /// Initialize stage
 /// < ass Asset pack
-void init_stage(ASSET_PACK* ass);
+int init_stage(ASSET_PACK* ass);
 
 /// Update stage
 /// < pl Player

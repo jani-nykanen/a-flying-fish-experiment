@@ -1,0 +1,23 @@
+# Decorations
+
+mesh fir
+{
+    tex fir_tex
+
+    pos 15 4.9 -12
+    scale 4 6 4
+    add
+
+    pos -4 4.9 14
+    scale -4 6 4
+    add
+}
+     
+mesh house
+{
+    tex house_tex
+
+    pos 17.5 3.3 4.0
+    scale 5 6 5
+    add
+}

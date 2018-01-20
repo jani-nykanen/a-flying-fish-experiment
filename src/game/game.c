@@ -40,7 +40,8 @@ static int game_init()
     bmpFont = (BITMAP*)get_asset(ass,"font");
 
     init_player(ass);
-    init_stage(ass);
+    if(init_stage(ass) == 1)
+        return 1;
 
     player = pl_create(vec3(0.0f,0.0f,0.0f));
     cam = create_camera(player.pos);

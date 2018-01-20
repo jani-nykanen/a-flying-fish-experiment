@@ -6,6 +6,9 @@
 
 #include "../engine/vector.h"
 #include "../engine/graphics.h"
+#include "../engine/assets.h"
+
+#include "../lib/parseword.h"
 
 /// Decoration type
 typedef struct
@@ -27,5 +30,12 @@ DECORATION new_decoration(VEC3 pos, VEC3 scale, MESH* m, BITMAP* texture);
 /// Draw a decoration
 /// < dec Decoration
 void draw_decoration(DECORATION* dec);
+
+/// Read decorations from a layout file
+/// < ass Asset pack
+/// < wd Word data
+/// < dec An array of decorations
+/// > Decoration count
+int read_decoration_from_layout(ASSET_PACK* ass, WORDDATA* wd, DECORATION* dec);
 
 #endif // __DECORATION__
