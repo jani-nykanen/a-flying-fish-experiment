@@ -8,6 +8,11 @@
 #include "../engine/graphics.h"
 #include "../engine/transform.h"
 
+#include "stdio.h"
+#include "stdlib.h"
+#include "math.h"
+#include "time.h"
+
 // Grass texture
 static BITMAP* bmpGrass;
 // Road texture
@@ -27,6 +32,9 @@ static BITMAP* bmpFence;
 static DECORATION decorations[DEC_MAX];
 // Decoration count
 static int decCount;
+
+// TEMP
+static MESH* mBus;
 
 
 // Draw a floor tile (or piece of it)
@@ -264,6 +272,8 @@ int init_stage(ASSET_PACK* ass)
     bmpMoon = (BITMAP*)get_asset(ass,"moon");
     bmpFence = (BITMAP*)get_asset(ass,"fence");
 
+    mBus = (MESH*)get_asset(ass,"house");
+
     // Read layout file
     WORDDATA* layout = parse_file("assets/layout.txt");
     if(layout == NULL)
@@ -278,7 +288,7 @@ int init_stage(ASSET_PACK* ass)
 // Update stage
 void update_stage(PLAYER* pl, float tm)
 {
-
+    pl_mesh_collision(pl,mBus,vec3(17.5, 3.1, 4.0),vec3(5, 6 ,5));
 }
 
 

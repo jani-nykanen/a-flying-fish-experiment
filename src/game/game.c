@@ -75,7 +75,6 @@ static void game_draw()
 
     toggle_lighting(false);
 
-
     draw_stage(&cam);
     toggle_darkness(false);
 

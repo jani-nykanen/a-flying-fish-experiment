@@ -8,9 +8,6 @@
 
 #include "mesh.h"
 
-#include "GL/glew.h"
-#include "GL/gl.h"
-
 #include "../lib/parseword.h"
 
 #include "stdio.h"

@@ -5,7 +5,10 @@
 
 #include "../engine/transform.h"
 
+#include "stdio.h"
+#include "stdlib.h"
 #include "math.h"
+#include "time.h"
 
 
 // Limit camera

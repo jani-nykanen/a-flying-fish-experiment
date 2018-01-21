@@ -195,6 +195,7 @@ VEC3 tr_use_transform(VEC3 p)
     p.x = x * msc[5] - y * msc[4];
     p.y = x * msc[4] + y * msc[5] ;
 
+    // Scale
     p.x *= modelScale.x;
     p.y *= modelScale.y;
     p.z *= modelScale.z;

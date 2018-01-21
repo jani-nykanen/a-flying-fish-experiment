@@ -6,6 +6,7 @@
 
 #include "../engine/vector.h"
 #include "../engine/assets.h"
+#include "../engine/mesh.h"
 
 /// Player type
 typedef struct
@@ -21,6 +22,8 @@ typedef struct
     VEC3 angleTarget;
     VEC3 angleMax;
     VEC3 angleAcc;
+
+    float radius;
 }
 PLAYER;
 
@@ -41,6 +44,13 @@ void pl_update(PLAYER* pl, float tm);
 /// Draw player
 /// < pl Player
 void pl_draw(PLAYER* pl);
+
+/// Player-mesh collision
+/// < pl Player
+/// < m Mesh
+/// < tr Translation
+/// < sc Scale
+void pl_mesh_collision(PLAYER* pl, MESH* m, VEC3 tr, VEC3 sc);
 
 #endif // __PLAYER__
 

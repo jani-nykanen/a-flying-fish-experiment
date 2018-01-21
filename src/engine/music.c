@@ -9,6 +9,7 @@
 #include "time.h"
 #include "stdlib.h"
 #include "math.h"
+#include "stdio.h"
 
 /// Global music volume
 static float globalMusicVol;

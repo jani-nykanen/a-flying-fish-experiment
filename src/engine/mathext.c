@@ -39,8 +39,8 @@ bool inside_triangle(float px, float py, float x1, float y1, float x2, float y2,
      * Explanation: https://stackoverflow.com/a/9755252
     */
 
-    int as_x = px-x1;
-    int as_y = py-y1;
+    float as_x = px-x1;
+    float as_y = py-y1;
  
     bool s_ab = (x2-x1)*as_y-(y2-y1)*as_x > 0;
  

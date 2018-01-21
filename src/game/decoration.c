@@ -5,6 +5,11 @@
 
 #include "../engine/transform.h"
 
+#include "stdio.h"
+#include "stdlib.h"
+#include "math.h"
+#include "time.h"
+
 #define IS(s,x) strcmp(s,x) == 0
 
 // Create a new decoration

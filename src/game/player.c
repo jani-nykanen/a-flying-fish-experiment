@@ -5,9 +5,12 @@
 
 #include "../engine/graphics.h"
 #include "../engine/transform.h"
+#include "../engine/mathext.h"
 
-#include "math.h"
 #include "stdio.h"
+#include "stdlib.h"
+#include "math.h"
+#include "time.h"
 
 #include "../vpad.h"
 
@@ -144,6 +147,29 @@ static void pl_move(PLAYER* pl, float tm)
 }
 
 
+// Player-triangle collision
+static void pl_triangle_collision(PLAYER* pl, VEC3 A, VEC3 B, VEC3 C, VEC3 N)
+{
+    if(!(inside_triangle(pl->pos.x,pl->pos.y,A.x,A.y,B.x,B.y,C.x,C.y)
+    || inside_triangle(pl->pos.x,pl->pos.z,A.x,A.z,B.x,B.z,C.x,C.z)
+    || inside_triangle(pl->pos.y,pl->pos.z,A.y,A.z,B.y,B.z,C.y,C.z)))
+    {
+        return;
+    }
+
+    float d = -(N.x * A.x + N.y * A.y + N.z * A.z);
+    float dist = fabs(pl->pos.x * N.x + pl->pos.y * N.y + pl->pos.z * N.z + d) 
+            / sqrt( N.x*N.x + N.y*N.y + N.z*N.z);
+
+    if(dist < pl->radius)
+    {
+        pl->pos.x -= N.x * (dist-pl->radius);
+        pl->pos.y -= N.y * (dist-pl->radius);
+        pl->pos.z -= N.z * (dist-pl->radius);
+    }
+}
+
+
 // Initialize
 void init_player(ASSET_PACK* ass)
 {
@@ -165,6 +191,8 @@ PLAYER pl_create(VEC3 pos)
     pl.pos = pos;
     pl.speed = vec3(0,0,0);
     pl.target = pl.speed;
+
+    pl.radius = 0.5f;
 
     pl.maxSpeed = vec3(MAX_SPEED,MAX_SPEED,MAX_SPEED);
     pl.angleMax = vec3(MAX_ANGLE_XZ,MAX_ANGLE_Y,MAX_ANGLE_XZ);
@@ -201,3 +229,38 @@ void pl_draw(PLAYER* pl)
     draw_mesh(mFish);
 }
 
+
+// Player-mesh collision
+void pl_mesh_collision(PLAYER* pl, MESH* m, VEC3 tr, VEC3 sc)
+{
+    if(pl == NULL || m == NULL) return;
+
+    VEC3 A;
+    VEC3 B;
+    VEC3 C;
+    VEC3 N;
+
+    int i = 0;
+    for(; i < m->elementCount; i += 3)
+    {
+        A = vec3(m->vertices[m->indices[i]*3],m->vertices[m->indices[i]*3 +1],m->vertices[m->indices[i]*3+2]);
+        B = vec3(m->vertices[m->indices[i]*3 +3],m->vertices[m->indices[i]*3 +4],m->vertices[m->indices[i]*3+5]);
+        C = vec3(m->vertices[m->indices[i]*3 +6],m->vertices[m->indices[i]*3 +7],m->vertices[m->indices[i]*3+8]);
+
+        N = vec3(m->normals[m->indices[i]*3],m->normals[m->indices[i]*3 +1],m->normals[m->indices[i]*3+2]);
+
+        A.x *= sc.x; A.x += tr.x;
+        A.y *= sc.y; A.y += tr.y;
+        A.z *= sc.z; A.z += tr.z;
+
+        B.x *= sc.x; B.x += tr.x;
+        B.y *= sc.y; B.y += tr.y;
+        B.z *= sc.z; B.z += tr.z;
+
+        C.x *= sc.x; C.x += tr.x;
+        C.y *= sc.y; C.y += tr.y;
+        C.z *= sc.z; C.z += tr.z;
+
+        pl_triangle_collision(pl,A,B,C,N);
+    }
+}

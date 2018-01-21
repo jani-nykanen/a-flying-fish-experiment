@@ -160,6 +160,8 @@ static int app_init_SDL()
         SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR,"Error!","Failed to create an SDL renderer!\n",NULL);
         return 1;
     }
+    SDL_RenderClear(rend);
+    SDL_RenderPresent(rend);
 
     // Hide mouse cursor
     SDL_ShowCursor(0);

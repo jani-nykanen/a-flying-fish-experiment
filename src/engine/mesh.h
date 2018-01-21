@@ -6,6 +6,8 @@
 
 #include "SDL2/SDL.h"
 
+#include "vector.h"
+
 /** Mesh type */
 typedef struct
 {
