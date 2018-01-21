@@ -20,6 +20,7 @@
     pyramid_tex pyramid.png
     bus_tex bus.png
     tree_tex tree.png
+    oneway oneway.png
 }
 
 @path assets/models/
@@ -32,4 +33,5 @@
     pyramid pyramid.obj
     bus bus.obj
     tree tree.obj
+    plane plane.obj
 }

@@ -57,3 +57,12 @@ mesh tree
     scale -3 3.25 3
     add
 }
+
+mesh plane
+{
+    tex oneway
+
+    pos -1.5 2.5 -4.0
+    scale 2.5 2.5 2.5
+    add
+}
