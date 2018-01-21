@@ -48,3 +48,12 @@ mesh bus
     scale -3 3 3
     add
 }
+
+mesh tree
+{
+    tex tree_tex
+
+    pos -10.0 5.1 -11.0
+    scale -3 3.25 3
+    add
+}

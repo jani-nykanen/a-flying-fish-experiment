@@ -19,6 +19,7 @@
     dogh_tex dog_house.png
     pyramid_tex pyramid.png
     bus_tex bus.png
+    tree_tex tree.png
 }
 
 @path assets/models/
@@ -30,4 +31,5 @@
     doghouse dog_house.obj
     pyramid pyramid.obj
     bus bus.obj
+    tree tree.obj
 }
