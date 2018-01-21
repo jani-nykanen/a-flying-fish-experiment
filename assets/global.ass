@@ -21,6 +21,9 @@
     bus_tex bus.png
     tree_tex tree.png
     oneway oneway.png
+    stop stop.png
+    sandbox_tex sandbox.png
+    slippery slippery.png
 }
 
 @path assets/models/
@@ -34,4 +37,6 @@
     bus bus.obj
     tree tree.obj
     plane plane.obj
+    plane2 plane2.obj
+    sandbox sandbox.obj
 }

@@ -66,3 +66,30 @@ mesh plane
     scale 2.5 2.5 2.5
     add
 }
+
+mesh plane2
+{
+    tex stop
+
+    pos 10.5 1.5 22.0
+    scale -1.5 3.5 1.5
+    add
+}
+
+mesh sandbox
+{
+    tex sandbox_tex
+
+    pos -14 4.5 -1.0
+    scale 2.25 2.5 2.25
+    add
+}
+
+mesh plane
+{
+    tex slippery
+
+    pos -8.25 1.5 5.0
+    scale 1.5 3.5 1.5
+    add
+}
