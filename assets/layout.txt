@@ -35,8 +35,8 @@ mesh pyramid
 {
     tex pyramid_tex
 
-    pos -14.5 4.8 15.0
-    scale 6 8 6
+    pos -15.5 4.0 16.0
+    scale 3 4 3
     add
 }
 
