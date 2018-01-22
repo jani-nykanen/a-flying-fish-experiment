@@ -20,6 +20,9 @@ typedef struct
     Uint32 uvCount;
     Uint32 normalCount;
     Uint32 elementCount;
+
+    VEC3 minV;
+    VEC3 maxV;
 }
 MESH;
 

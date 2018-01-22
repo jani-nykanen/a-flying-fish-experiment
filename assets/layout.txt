@@ -5,11 +5,11 @@ mesh fir
     tex fir_tex
 
     pos 15 4.9 -12
-    scale 4 6 4
+    scale 4 6.5 4
     add
 
     pos -4 4.9 17
-    scale -4 6 4
+    scale 4 6.5 4
     add
 }
      
@@ -27,7 +27,7 @@ mesh doghouse
     tex dogh_tex
     
     pos 13.5 4.85 16.0
-    scale -1.8 1.8 -1.8
+    scale 1.8 1.8 1.8
     add
 }
 
@@ -36,7 +36,7 @@ mesh pyramid
     tex pyramid_tex
 
     pos -14.5 4.8 15.0
-    scale -6 8 6
+    scale 6 8 6
     add
 }
 
@@ -45,7 +45,7 @@ mesh bus
     tex bus_tex
     
     pos 4.0 5.1 -15.0
-    scale -3 3 3
+    scale 3 3 3
     add
 }
 
@@ -54,7 +54,7 @@ mesh tree
     tex tree_tex
 
     pos -10.0 5.1 -11.0
-    scale -3 3.25 3
+    scale 3 3.25 3
     add
 }
 
@@ -72,7 +72,7 @@ mesh plane2
     tex stop
 
     pos 10.5 1.5 22.0
-    scale -1.5 3.5 1.5
+    scale 1.5 3.5 1.5
     add
 }
 

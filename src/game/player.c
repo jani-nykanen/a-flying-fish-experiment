@@ -158,14 +158,16 @@ static void pl_triangle_collision(PLAYER* pl, VEC3 A, VEC3 B, VEC3 C, VEC3 N)
     }
 
     float d = -(N.x * A.x + N.y * A.y + N.z * A.z);
-    float dist = fabs(pl->pos.x * N.x + pl->pos.y * N.y + pl->pos.z * N.z + d) 
+    float dist = (pl->pos.x * N.x + pl->pos.y * N.y + pl->pos.z * N.z + d) 
             / sqrt( N.x*N.x + N.y*N.y + N.z*N.z);
 
-    if(dist < pl->radius)
+    float dir = dist > 0 ? 1.0f : -1.0f;
+
+    if(fabs(dist) < pl->radius)
     {
-        pl->pos.x -= N.x * (dist-pl->radius);
-        pl->pos.y -= N.y * (dist-pl->radius);
-        pl->pos.z -= N.z * (dist-pl->radius);
+        pl->pos.x -= dir* N.x * (fabs(dist)-pl->radius);
+        pl->pos.y -= dir* N.y * (fabs(dist)-pl->radius);
+        pl->pos.z -= dir* N.z * (fabs(dist)-pl->radius);
     }
 }
 
@@ -234,6 +236,25 @@ void pl_draw(PLAYER* pl)
 void pl_mesh_collision(PLAYER* pl, MESH* m, VEC3 tr, VEC3 sc)
 {
     if(pl == NULL || m == NULL) return;
+
+    VEC3 minV = m->minV;
+    VEC3 maxV = m->maxV;
+
+    minV.x *= sc.x; minV.x += tr.x;
+    minV.y *= sc.y; minV.y += tr.y;
+    minV.z *= sc.z; minV.z += tr.z;
+
+    maxV.x *= sc.x; maxV.x += tr.x;
+    maxV.y *= sc.y; maxV.y += tr.y;
+    maxV.z *= sc.z; maxV.z += tr.z;
+    
+    minV.x -= pl->radius*2; minV.y -= pl->radius*2; minV.z -= pl->radius*2;
+    maxV.x += pl->radius*2; maxV.y += pl->radius*2; maxV.z += pl->radius*2;
+
+    if(pl->pos.x < minV.x || pl->pos.x > maxV.x
+    || pl->pos.y < minV.y || pl->pos.y > maxV.y
+    || pl->pos.z < minV.z || pl->pos.z > maxV.z) 
+        return;
 
     VEC3 A;
     VEC3 B;

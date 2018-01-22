@@ -81,3 +81,14 @@ int read_decoration_from_layout(ASSET_PACK* ass, WORDDATA* wd, DECORATION* dec)
 
     return decCount;
 }
+
+
+// Player-decorations collisions
+void player_decoration_collision(PLAYER* pl, DECORATION* dec, int count)
+{
+    int i = 0;
+    for(; i < count; ++ i)
+    {
+        pl_mesh_collision(pl,dec[i].mesh,dec[i].pos,dec[i].scale);
+    }
+}

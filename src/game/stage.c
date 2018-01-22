@@ -288,7 +288,9 @@ int init_stage(ASSET_PACK* ass)
 // Update stage
 void update_stage(PLAYER* pl, float tm)
 {
-    pl_mesh_collision(pl,mBus,vec3(17.5, 3.1, 4.0),vec3(5, 6 ,5));
+    // pl_mesh_collision(pl,mBus,vec3(17.5, 3.1, 4.0),vec3(5, 6 ,5));
+    
+    player_decoration_collision(pl,decorations,decCount);
 }
 
 

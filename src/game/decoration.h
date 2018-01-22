@@ -10,6 +10,8 @@
 
 #include "../lib/parseword.h"
 
+#include "player.h"
+
 /// Decoration type
 typedef struct
 {
@@ -37,5 +39,11 @@ void draw_decoration(DECORATION* dec);
 /// < dec An array of decorations
 /// > Decoration count
 int read_decoration_from_layout(ASSET_PACK* ass, WORDDATA* wd, DECORATION* dec);
+
+/// Player-decorations collisions
+/// < pl Player
+/// < dec Decorations
+/// < count Decoration count
+void player_decoration_collision(PLAYER* pl, DECORATION* dec, int count);
 
 #endif // __DECORATION__

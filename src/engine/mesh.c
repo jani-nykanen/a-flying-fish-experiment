@@ -179,6 +179,9 @@ MESH* load_mesh(const char* path)
     m->normalCount = elementCount * 3;
     m->elementCount = elementCount;
 
+    m->minV = vec3(9999,9999,9999);
+    m->maxV = vec3(-9999,-9999,-9999);
+
     // Store indexed data
     int i = 0;
     for(; i < elementCount; ++ i)
@@ -186,6 +189,14 @@ MESH* load_mesh(const char* path)
         m->vertices[i*3] = vertices[ (indices[i*3]-1)*3 ];
         m->vertices[i*3 +1] = vertices[ (indices[i*3]-1)*3 +1];
         m->vertices[i*3 +2] = vertices[ (indices[i*3]-1)*3 +2];
+
+        if(m->vertices[i*3] < m->minV.x) m->minV.x = m->vertices[i*3];
+        if(m->vertices[i*3 +1] < m->minV.y) m->minV.y = m->vertices[i*3 +1];
+        if(m->vertices[i*3 +2] < m->minV.z) m->minV.z = m->vertices[i*3 +2];
+
+        if(m->vertices[i*3] > m->maxV.x) m->maxV.x = m->vertices[i*3];
+        if(m->vertices[i*3 +1] > m->maxV.y) m->maxV.y = m->vertices[i*3 +1];
+        if(m->vertices[i*3 +2] > m->maxV.z) m->maxV.z = m->vertices[i*3 +2];
 
         m->uvs[i*2] = uvs[ (indices[i*3 +1] -1)*2];
         m->uvs[i*2 +1] = 1.0f- uvs[ (indices[i*3 +1] -1)*2 +1];
