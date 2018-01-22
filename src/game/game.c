@@ -58,6 +58,11 @@ static void game_update(float tm)
     pl_update(&player,tm);
     update_stage(&player,tm);
     cam_follow_player(&cam,&player,tm);
+
+    if(get_key_state((int)SDL_SCANCODE_ESCAPE) == PRESSED)
+    {
+        if(ask_to_quit() == 1) app_terminate();
+    }
 }
 
 

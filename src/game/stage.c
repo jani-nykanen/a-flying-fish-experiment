@@ -33,9 +33,6 @@ static DECORATION decorations[DEC_MAX];
 // Decoration count
 static int decCount;
 
-// TEMP
-static MESH* mBus;
-
 
 // Draw a floor tile (or piece of it)
 static void draw_floor_tile_small(float x, float y, float z, float w, float h, float u, float v, float uw, float vh)
@@ -272,8 +269,6 @@ int init_stage(ASSET_PACK* ass)
     bmpMoon = (BITMAP*)get_asset(ass,"moon");
     bmpFence = (BITMAP*)get_asset(ass,"fence");
 
-    mBus = (MESH*)get_asset(ass,"house");
-
     // Read layout file
     WORDDATA* layout = parse_file("assets/layout.txt");
     if(layout == NULL)
@@ -288,9 +283,9 @@ int init_stage(ASSET_PACK* ass)
 // Update stage
 void update_stage(PLAYER* pl, float tm)
 {
-    // pl_mesh_collision(pl,mBus,vec3(17.5, 3.1, 4.0),vec3(5, 6 ,5));
-    
     player_decoration_collision(pl,decorations,decCount);
+
+    pl_fence_collision(pl,-1,-25,-25,25,25,0.0f,10.0f,tm);
 }
 
 

@@ -1,4 +1,4 @@
-/// Main file
+/// Main file (source)
 /// (c) 2018 Jani Nykänen
 
 #include "app.h"
@@ -17,92 +17,50 @@
 #include "math.h"
 #include "stdio.h"
 
-/// Is application app_running
+// Is application app_running
 static bool isRunning;
-/// Is full screen
+// Is full screen
 static bool isFullscreen;
 
-/// Window
+// Window
 static SDL_Window* window;
-/// Renderer
+// Renderer
 static SDL_Renderer* rend;
-/// Canvas
+// Canvas
 static FRAME* canvas;
 
-/// (Timer) old ticks
+// (Timer) old ticks
 static int oldTicks;
-/// (Timer) new ticks
+// (Timer) new ticks
 static int newTicks;
-/// (Timer) delta time
+// (Timer) delta time
 static int deltaTime;
 
-/// Canvas pos
+// Canvas pos
 static SDL_Point canvasPos;
-/// Canvas size
+// Canvas size
 static SDL_Point canvasSize;
 
-/// Current scene
+// Current scene
 static SCENE currentScene;
-/// Global scene
+// Global scene
 static SCENE globalScene;
-/// Scenes
+// Scenes
 static SCENE scenes[16];
-/// Scene count
+// Scene count
 static Uint8 sceneCount;
 
-/// Wait time
+// Wait time
 static int frame_wait;
 
-/// Configuration
+// Configuration
 static CONFIG config;
 
-/// Joystick
+// Joystick
 static SDL_Joystick* joy;
 
-/// Ask if the user wants to quit
-static void ask_to_quit()
-{
-    const SDL_MessageBoxButtonData buttons[] = {
-        { 0, 0, "Yes" },
-        { SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "No" },
-        
-    };
-    const SDL_MessageBoxColorScheme colorScheme = {
-        { 
-            { 85,   85,   85 },
-            {   255, 255,   255 },
-            { 255, 255,   255 },
-            {   170,   170, 170 },
-            { 255,   255, 0 }
-        }
-    };
 
-    const SDL_MessageBoxData messageboxdata = {
-        SDL_MESSAGEBOX_INFORMATION,
-        NULL, 
-        "Quit application?", 
-        "Are you sure you want to\nterminate the application?", 
-        SDL_arraysize(buttons),
-        buttons,
-        &colorScheme
-    };
-
-    int buttonid;
-    if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) 
-    {
-        printf("Error displaying a message box!\n");
-        return;
-    }
-
-    if (buttonid == 0)
-    {
-        isRunning = false;
-    }
-}
-
-/// Calculate canvas size and position on screen
-/// < winWidth Window width
-/// < winHeight Window height
+// Calculate canvas size and position on screen
 static void app_calc_canvas_prop(int winWidth, int winHeight)
 {
     // If aspect ratio is bigger or equal to the ratio of the canvas
@@ -124,8 +82,8 @@ static void app_calc_canvas_prop(int winWidth, int winHeight)
     }
 }
 
-/// Initialize SDL
-/// > An error code, 0 on success, 1 on error
+
+// Initialize SDL
 static int app_init_SDL()
 {   
     // Init
@@ -183,15 +141,16 @@ static int app_init_SDL()
     return 0;
 }
 
-/// Toggle fullscreen mode
+
+// Toggle fullscreen mode
 void app_toggle_fullscreen()
 {
     SDL_SetWindowFullscreen(window,!isFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 	isFullscreen = !isFullscreen;
 }
 
-/// Initialize application
-/// > An error code, 0 on success, 1 on error
+
+// Initialize application
 static int app_init(SCENE* arrScenes, int count, const char* assPath)
 {
     // Init SDL
@@ -253,7 +212,8 @@ static int app_init(SCENE* arrScenes, int count, const char* assPath)
     return 0;
 }
 
-/// Go through events
+
+// Go through events
 static void app_events()
 {
     SDL_Event event;
@@ -353,8 +313,9 @@ static void app_events()
 
 }   
 
-/// Update application
-/// < delta Delta time in milliseconds
+
+// Update application
+// < delta Delta time in milliseconds
 static void app_update(Uint32 delta)
 {
     float tm = (float)((float)delta/1000.0f) / (1.0f/60.0f);
@@ -392,7 +353,8 @@ static void app_update(Uint32 delta)
 
 }
 
-/// Draw application
+
+// Draw application
 static void app_draw()
 {
     // Clear to black
@@ -418,7 +380,8 @@ static void app_draw()
     SDL_RenderPresent(rend);
 }
 
-/// Destroy application
+
+// Destroy application
 static void app_destroy()
 {
     SDL_DestroyRenderer(rend);
@@ -427,7 +390,8 @@ static void app_destroy()
     SDL_JoystickClose(joy);
 }
 
-/// Swap scene
+
+// Swap scene
 void app_swap_scene(const char* name)
 {
     int i = 0;
@@ -444,20 +408,22 @@ void app_swap_scene(const char* name)
 
 }
 
-/// Terminate application
+
+// Terminate application
 void app_terminate()
 {
     isRunning = false;
 }
 
-/// Get main frame
+
+// Get main frame
 FRAME* app_get_canvas()
 {
     return canvas;
 }
 
-/// Run application
-/// > An error code, 0 on success, 1 on error
+
+// Run application
 int app_run(SCENE* arrScenes, int count, CONFIG c)
 {
     config = c;
@@ -483,6 +449,51 @@ int app_run(SCENE* arrScenes, int count, CONFIG c)
 
     }
     app_destroy();
+
+    return 0;
+}
+
+
+/// Ask if the user wants to quit
+int ask_to_quit()
+{
+    const SDL_MessageBoxButtonData buttons[] = {
+        { 0, 0, "Yes" },
+        { SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "No" },
+        
+    };
+    const SDL_MessageBoxColorScheme colorScheme = {
+        { 
+            { 85,   85,   85 },
+            {   255, 255,   255 },
+            { 255, 255,   255 },
+            {   170,   170, 170 },
+            { 255,   255, 0 }
+        }
+    };
+
+    const SDL_MessageBoxData messageboxdata = {
+        SDL_MESSAGEBOX_INFORMATION,
+        NULL, 
+        "Quit application?", 
+        "Are you sure you want to\nterminate the application?", 
+        SDL_arraysize(buttons),
+        buttons,
+        &colorScheme
+    };
+
+    int buttonid;
+    if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) 
+    {
+        printf("Error displaying a message box!\n");
+        return 1;
+    }
+
+    if (buttonid == 0)
+    {
+        isRunning = false;
+        return 1;
+    } 
 
     return 0;
 }

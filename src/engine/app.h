@@ -31,4 +31,8 @@ FRAME* app_get_canvas();
 /// > An error code, 0 on success, 1 on error
 int app_run(SCENE* arrScenes, int count, CONFIG c);
 
+/// Ask if the user wants to quit
+/// > 1 if yes, 0 otherwise
+int ask_to_quit();
+
 #endif // __APPLICATION__

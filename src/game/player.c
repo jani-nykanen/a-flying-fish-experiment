@@ -168,6 +168,10 @@ static void pl_triangle_collision(PLAYER* pl, VEC3 A, VEC3 B, VEC3 C, VEC3 N)
         pl->pos.x -= dir* N.x * (fabs(dist)-pl->radius);
         pl->pos.y -= dir* N.y * (fabs(dist)-pl->radius);
         pl->pos.z -= dir* N.z * (fabs(dist)-pl->radius);
+
+        pl->speed.x += dir * N.x  * pl->maxSpeed.x * 0.5f;
+        pl->speed.y += dir * N.y  * pl->maxSpeed.y * 0.5f;
+        pl->speed.z += dir * N.z  * pl->maxSpeed.z * 0.5f;
     }
 }
 
@@ -283,5 +287,35 @@ void pl_mesh_collision(PLAYER* pl, MESH* m, VEC3 tr, VEC3 sc)
         C.z *= sc.z; C.z += tr.z;
 
         pl_triangle_collision(pl,A,B,C,N);
+    }
+}
+
+
+// Player-fence collision
+void pl_fence_collision(PLAYER* pl,float y,float sx, float sz, float ex, float ez, float skip, float skipl, float tm)
+{
+    if(pl->pos.y - pl->radius < y)
+        return;
+
+    if(pl->pos.z+pl->radius > sz && pl->pos.z-pl->radius < ez)
+    {
+        if( (pl->speed.x < 0.0f && pl->pos.x-pl->radius < sx && pl->pos.x-pl->radius > sx - 0.25f*tm)
+        || (pl->speed.x > 0.0f && pl->pos.x+pl->radius > ex && pl->pos.x+pl->radius < ex + 0.25f*tm))
+        {
+            pl->speed.x = 0.0f;
+            pl->pos.x = pl->pos.x < 0.0f ? sx+pl->radius : ex-pl->radius;
+        }
+    }
+    
+    if(pl->pos.x+pl->radius > sz && pl->pos.x-pl->radius < ex)
+    {
+        if(pl->pos.x-pl->radius > skip && pl->pos.x + pl->radius < skip+skipl) return;
+
+        if( (pl->speed.z < 0.0f && pl->pos.z-pl->radius < sz && pl->pos.z-pl->radius > sz - 0.25f*tm)
+        || (pl->speed.z > 0.0f && pl->pos.z+pl->radius > ez && pl->pos.z+pl->radius < ez + 0.25f*tm))
+        {
+            pl->speed.z = 0.0f;
+            pl->pos.z = pl->pos.z < 0.0f ? (sz+pl->radius) : (ez-pl->radius);
+        }
     }
 }

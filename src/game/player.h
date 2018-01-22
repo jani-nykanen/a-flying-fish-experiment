@@ -52,5 +52,17 @@ void pl_draw(PLAYER* pl);
 /// < sc Scale
 void pl_mesh_collision(PLAYER* pl, MESH* m, VEC3 tr, VEC3 sc);
 
+/// Player-fence collision
+/// < y Y coordinate
+/// < sx Start x
+/// < sy Start y
+/// < sz Start z
+/// < ex End x
+/// < ez End z
+/// < skip Skip position
+/// < skipl Skipping length
+/// < tm Time multiplier
+void pl_fence_collision(PLAYER* pl, float y, float sx, float sz, float ex, float ez, float skip, float skipl, float tm);
+
 #endif // __PLAYER__
 
