@@ -51,6 +51,8 @@ int read_decoration_from_layout(ASSET_PACK* ass, WORDDATA* wd, DECORATION* dec)
     for(; i < wd->wordCount; ++ i)
     {
         w = get_word(wd,i);
+        if(IS(w,"@enddec")) break;
+
         if(IS(w,"mesh"))
         {
             m = (MESH*)get_asset(ass,get_word(wd,i+1));

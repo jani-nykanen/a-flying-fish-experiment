@@ -280,11 +280,10 @@ int init_stage(ASSET_PACK* ass)
 }
 
 
-// Update stage
-void update_stage(PLAYER* pl, float tm)
+// Stage-player collision
+void stage_player_collision(PLAYER* pl, float tm)
 {
     player_decoration_collision(pl,decorations,decCount);
-
     pl_fence_collision(pl,-1,-25,-25,25,25,0.0f,10.0f,tm);
 }
 

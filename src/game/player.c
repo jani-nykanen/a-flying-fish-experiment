@@ -14,10 +14,20 @@
 
 #include "../vpad.h"
 
+// Max values (default)
+const float MAX_SPEED = 0.1f;
+const float MAX_ANGLE_Y = 0.025f;
+const float MAX_ANGLE_XZ = 0.05f;
+const float ACC = 0.01f;
+const float ANGLE_ACC = 0.05f;
+const float SWIMV_MIN = 0.001f;
+const float SWIMV_MAX = 0.020f;
+
 // Fish mesh
 static MESH* mFish;
-// Fish texture
+// Fish textures
 static BITMAP* bmpFish;
+static BITMAP* bmpFish2;
 
 
 // Limit player area
@@ -31,12 +41,26 @@ static void pl_limit(PLAYER* pl)
         pl->pos.y = -UPPER_LIMIT;
         pl->angleTarget.x = 0.0f;
         pl->speed.y = 0.0f;
+
+        if(!pl->control)
+        {
+            pl->angle.x += M_PI/2;
+            pl->speed.y *= -1;
+            pl->target.y = fabs(pl->target.y);
+        }
     }
     else if(pl->speed.y > 0.0f && pl->pos.y > -LOWER_LIMIT)
     {
         pl->pos.y = -LOWER_LIMIT;
         pl->angleTarget.x = 0.0f;
         pl->speed.y = 0.0f;
+
+        if(!pl->control)
+        {
+            pl->angle.x -= M_PI/2;
+            pl->speed.y *= -1;
+            pl->target.y = -fabs(pl->target.y);
+        }
     }
 
 }
@@ -50,6 +74,7 @@ static void pl_speed_delta(float* speed, float target, float acc, float tm)
         *speed += acc * tm;
         if(*speed > target)
             *speed = target;
+            
     }
     else if(target < *speed)
     {
@@ -67,23 +92,58 @@ static void pl_limit_angle(PLAYER* pl)
     {
         pl->angle.x = M_PI/4;
         pl->angleSpeed.x = 0.0f;
+
+        if(!pl->control)
+        {
+            pl->swimAngleMod2 -= M_PI;
+        }
     }
     else if(pl->angle.x < -M_PI/4)
     {
         pl->angle.x = -M_PI/4;
         pl->angleSpeed.x = 0.0f;
+
+        if(!pl->control)
+        {
+            pl->swimAngleMod2 -= M_PI;
+        }
+    }
+}
+
+
+// AI control for NPC fish
+static void pl_ai_control(PLAYER* pl, float tm)
+{
+    const float MAX_SWIM = 2.0f * M_PI;
+
+    pl->swimAngleMod += pl->swimWave * tm;
+    pl->swimAngleMod2 += pl->swimWave2 * tm;
+    
+    if(pl->swimAngleMod >= MAX_SWIM)
+    {
+        pl->swimAngleMod -= MAX_SWIM;
+        pl->swimWave = (float)(rand() % 1000) / 1000.0f * SWIMV_MAX + SWIMV_MIN;
+        pl->dir = (rand() % 2 == 0 ? 1.0f : -1.0f);
+
+        float mod = (float)(rand() % 100) / 100.0f * 0.5f + 0.75f;
+        pl->maxSpeed.x *= mod;
+        pl->maxSpeed.y *= mod;
+        pl->maxSpeed.z *= mod;
+    }
+    if(pl->swimAngleMod2 >= MAX_SWIM)
+    {
+        pl->swimAngleMod2 -= MAX_SWIM;
+        pl->swimWave2 = ( (float)(rand() % 1000) / 1000.0f * SWIMV_MAX + SWIMV_MIN );
     }
 
-    if(pl->angle.z > M_PI/4)
-    {
-        pl->angle.z = M_PI/4;
-        pl->angleSpeed.z = 0.0f;
-    }
-    else if(pl->angle.z < -M_PI/4)
-    {
-        pl->angle.z = -M_PI/4;
-        pl->angleSpeed.z = 0.0f;
-    }
+    pl->angle.y += 0.01f* pl->dir *sin( pl->swimAngleMod) * M_PI;
+    pl->angle.x += 0.025f* -1.0f * pl->dir *cos(pl->swimAngleMod2) * (M_PI/4.0f);
+
+    pl_limit_angle(pl);
+
+    pl->target.x = sin(pl->angle.y) * pl->maxSpeed.x;
+    pl->target.z = cos(pl->angle.y) * pl->maxSpeed.z;
+    pl->target.y = sin(pl->angle.x) * pl->maxSpeed.y;
 }
 
 
@@ -118,6 +178,7 @@ static void pl_control(PLAYER* pl)
 
     pl->target.x = sin(pl->angle.y) * pl->maxSpeed.x;
     pl->target.z = cos(pl->angle.y) * pl->maxSpeed.z;
+
 }
 
 
@@ -179,20 +240,15 @@ static void pl_triangle_collision(PLAYER* pl, VEC3 A, VEC3 B, VEC3 C, VEC3 N)
 // Initialize
 void init_player(ASSET_PACK* ass)
 {
-    bmpFish = get_asset(ass,"fish_tex");
-    mFish = get_asset(ass,"fish");
+    bmpFish = (BITMAP*)get_asset(ass,"fish_tex");
+    bmpFish2 = (BITMAP*)get_asset(ass,"fish_tex2");
+    mFish = (MESH*)get_asset(ass,"fish");
 }
 
 
 // Create
 PLAYER pl_create(VEC3 pos)
 {
-    const float MAX_SPEED = 0.1f;
-    const float MAX_ANGLE_Y = 0.025f;
-    const float MAX_ANGLE_XZ = 0.05f;
-    const float ACC = 0.01f;
-    const float ANGLE_ACC = 0.05f;
-
     PLAYER pl;
     pl.pos = pos;
     pl.speed = vec3(0,0,0);
@@ -209,6 +265,13 @@ PLAYER pl_create(VEC3 pos)
     pl.angle = vec3(0,0,0);
     pl.angleSpeed = vec3(0,0,0);
     pl.angleTarget = vec3(0,0,0);
+    pl.swimAngleMod = (float)(rand() % 1000)/1000.0f * M_PI*2;;
+
+    pl.swimWave = (float)(rand() % 1000) / 1000.0f * SWIMV_MAX + SWIMV_MIN;
+    pl.swimWave2 = ( (float)(rand() % 1000) / 1000.0f * SWIMV_MAX + SWIMV_MIN );
+    pl.dir = (rand() % 2 == 0 ? 1.0f : -1.0f);
+
+    pl.control = true;
 
     return pl;
 }
@@ -217,7 +280,11 @@ PLAYER pl_create(VEC3 pos)
 // Update
 void pl_update(PLAYER* pl, float tm)
 {
-    pl_control(pl);
+    if(pl->control)
+        pl_control(pl);
+    else
+        pl_ai_control(pl,tm);
+
     pl_limit(pl);
     pl_move(pl,tm);
     pl_rotate(pl,tm);
@@ -228,10 +295,10 @@ void pl_update(PLAYER* pl, float tm)
 void pl_draw(PLAYER* pl)
 {
     tr_translate_model(pl->pos.x,pl->pos.y,pl->pos.z);
-    tr_rotate_model(-M_PI/2+pl->angle.x,M_PI+pl->angle.y,M_PI/2); // - pl->angle.z);
+    tr_rotate_model(-M_PI/2+pl->angle.x,M_PI+pl->angle.y,M_PI/2);
     tr_scale_model(1.0f,1.0f,1.0f);
 
-    bind_texture(bmpFish);
+    bind_texture(pl->control ? bmpFish : bmpFish2);
     draw_mesh(mFish);
 }
 
@@ -294,7 +361,7 @@ void pl_mesh_collision(PLAYER* pl, MESH* m, VEC3 tr, VEC3 sc)
 // Player-fence collision
 void pl_fence_collision(PLAYER* pl,float y,float sx, float sz, float ex, float ez, float skip, float skipl, float tm)
 {
-    if(pl->pos.y - pl->radius < y)
+    if(pl->control && pl->pos.y - pl->radius < y)
         return;
 
     if(pl->pos.z+pl->radius > sz && pl->pos.z-pl->radius < ez)
@@ -302,20 +369,61 @@ void pl_fence_collision(PLAYER* pl,float y,float sx, float sz, float ex, float e
         if( (pl->speed.x < 0.0f && pl->pos.x-pl->radius < sx && pl->pos.x-pl->radius > sx - 0.25f*tm)
         || (pl->speed.x > 0.0f && pl->pos.x+pl->radius > ex && pl->pos.x+pl->radius < ex + 0.25f*tm))
         {
-            pl->speed.x = 0.0f;
+            if(pl->control)
+            {
+                pl->speed.x = 0.0f;
+            }
+            else
+            {
+                pl->speed.x *= -1;
+                pl->target.x *= -1;
+                pl->angle.y += M_PI;
+            }
+
             pl->pos.x = pl->pos.x < 0.0f ? sx+pl->radius : ex-pl->radius;
         }
     }
     
     if(pl->pos.x+pl->radius > sz && pl->pos.x-pl->radius < ex)
     {
-        if(pl->pos.x-pl->radius > skip && pl->pos.x + pl->radius < skip+skipl) return;
+        if(pl->control && pl->pos.x-pl->radius > skip && pl->pos.x + pl->radius < skip+skipl) return;
 
         if( (pl->speed.z < 0.0f && pl->pos.z-pl->radius < sz && pl->pos.z-pl->radius > sz - 0.25f*tm)
         || (pl->speed.z > 0.0f && pl->pos.z+pl->radius > ez && pl->pos.z+pl->radius < ez + 0.25f*tm))
         {
-            pl->speed.z = 0.0f;
+            if(pl->control)
+            {
+                pl->speed.z = 0.0f;
+            }
+            else
+            {
+                pl->speed.z *= -1;
+                pl->target.z *= -1;
+                pl->angle.y += M_PI;
+            }
             pl->pos.z = pl->pos.z < 0.0f ? (sz+pl->radius) : (ez-pl->radius);
         }
+    }
+}
+
+// Player-to-player collision
+void player_to_player_collision(PLAYER* pl, PLAYER* o, float tm)
+{
+    float dist = sqrt( (pl->pos.x-o->pos.x)*(pl->pos.x-o->pos.x) + (pl->pos.y-o->pos.y)*(pl->pos.y-o->pos.y) + (pl->pos.z-o->pos.z)*(pl->pos.z-o->pos.z));
+    float r = (pl->radius+o->radius)*1.6f;
+    if(dist < r)
+    {
+        float angle = atan2(pl->pos.z-o->pos.z,pl->pos.x-o->pos.x);
+        
+        o->pos.x += sin(angle) * (r-dist) / 2;
+        o->pos.z += cos(angle) * (r-dist) / 2;
+
+        pl->pos.x -= sin(angle) * (r-dist) / 2;
+        pl->pos.z -= cos(angle) * (r-dist) / 2;
+
+        float delta = (pl->pos.y-o->pos.y);
+
+        o->pos.y -= delta / 4;
+        pl->pos.y += delta / 4;
     }
 }

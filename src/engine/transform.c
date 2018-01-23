@@ -123,9 +123,9 @@ VEC3 tr_rotate_normal(VEC3 n)
 /// Rotate model
 void tr_rotate_model(float angle1, float angle2, float angle3)
 {
-    modelAngle1 += angle1;
-    modelAngle2 += angle2;
-    modelAngle3 += angle3;
+    modelAngle1 = angle1;
+    modelAngle2 = angle2;
+    modelAngle3 = angle3;
 
     modelChanged = true;
 }

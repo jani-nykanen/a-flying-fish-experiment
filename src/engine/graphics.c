@@ -34,7 +34,7 @@ static const float DEPTH_MIN = 0.025f;
 static const float DEPTH_MAX = 100.0f;
 
 // Size of triangle buffer
-#define TBUFFER_SIZE 1024
+#define TBUFFER_SIZE 4096
 // Triangle buffer
 static _TRIANGLE tbuffer[TBUFFER_SIZE];
 // Which triangles are drawn

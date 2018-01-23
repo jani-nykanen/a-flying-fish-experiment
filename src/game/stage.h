@@ -13,10 +13,10 @@
 /// < ass Asset pack
 int init_stage(ASSET_PACK* ass);
 
-/// Update stage
+/// Stage-player collision
 /// < pl Player
-/// < tm Time multiplier
-void update_stage(PLAYER* pl, float tm);
+/// < tm Time mul.
+void stage_player_collision(PLAYER* pl, float tm);
 
 /// Draw the stage
 /// < cam Camera

@@ -93,3 +93,32 @@ mesh plane
     scale 1.5 3.5 1.5
     add
 }
+
+@enddec
+
+fish 
+{
+    pos 6 -2 -14
+    add
+
+    pos 7 -2 8
+    add
+
+    pos -8 -4 17
+    add
+
+    pos -7 -2 -15
+    add
+
+    pos 15 -2 15
+    add
+
+    pos -12 0 4
+    add
+
+    pos -20 3 0
+    add
+
+    pos 1 0 -20
+    add
+}

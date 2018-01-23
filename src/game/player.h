@@ -8,6 +8,8 @@
 #include "../engine/assets.h"
 #include "../engine/mesh.h"
 
+#include "stdbool.h"
+
 /// Player type
 typedef struct
 {
@@ -24,6 +26,13 @@ typedef struct
     VEC3 angleAcc;
 
     float radius;
+    bool control;
+
+    float swimAngleMod;
+    float swimAngleMod2;
+    float dir;
+    float swimWave;
+    float swimWave2;
 }
 PLAYER;
 
@@ -63,6 +72,12 @@ void pl_mesh_collision(PLAYER* pl, MESH* m, VEC3 tr, VEC3 sc);
 /// < skipl Skipping length
 /// < tm Time multiplier
 void pl_fence_collision(PLAYER* pl, float y, float sx, float sz, float ex, float ez, float skip, float skipl, float tm);
+
+/// Player-to-player collision
+/// < pl Dominant player
+/// < o Object
+/// < tm Time mul. 
+void player_to_player_collision(PLAYER* pl, PLAYER* o, float tm);
 
 #endif // __PLAYER__
 
