@@ -5,6 +5,7 @@
 @type bitmap
 {
     font font.png
+    fontBig font_big.png
     
     grass grass.png
     road road.png

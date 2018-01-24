@@ -5,6 +5,8 @@
 
 #include "../engine/transform.h"
 
+#include "stage.h"
+
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
@@ -45,10 +47,12 @@ void cam_follow_player(CAMERA* cam, PLAYER* pl, float tm)
 {
     const float RESTRICT = 30.0f;
 
-    if(pl->pos.z < -RESTRICT || pl->pos.z > RESTRICT || pl->pos.x < -RESTRICT || pl->pos.x > RESTRICT)
+    if(!world_ended() && (pl->pos.z < -RESTRICT || pl->pos.z > RESTRICT || pl->pos.x < -RESTRICT || pl->pos.x > RESTRICT))
     {
+        pl->outsideCamera = true;
         return;
     }
+    pl->outsideCamera = false;
 
     float dist = hypot(pl->pos.x-cam->pos.x,pl->pos.z-cam->pos.z);
     float angle = atan2(pl->pos.z-cam->pos.z,pl->pos.x-cam->pos.x);
@@ -62,8 +66,9 @@ void cam_follow_player(CAMERA* cam, PLAYER* pl, float tm)
         cam->pos.y += (pl->pos.y - cam->pos.y) / 12.0f * tm;
     }    
 
-    cam->angle.y += (pl->angle.y - cam->angle.y)/24.0f * tm;
+    float targetAngle = world_ended() ? (M_PI + atan2(cam->pos.x,cam->pos.z)) : pl->angle.y;
 
+    cam->angle.y += (targetAngle - cam->angle.y)/24.0f * tm;
 
     cam->vpos.x = cam->pos.x - cos(cam->angle.y - M_PI/2.0f) * cam->dist;
     cam->vpos.y = cam->pos.y - 1.0f;

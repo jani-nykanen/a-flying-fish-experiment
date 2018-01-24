@@ -14,6 +14,10 @@
 
 #include "../vpad.h"
 
+#include "game.h"
+#include "stage.h"
+
+
 // Max values (default)
 const float MAX_SPEED = 0.1f;
 const float MAX_ANGLE_Y = 0.025f;
@@ -150,34 +154,44 @@ static void pl_ai_control(PLAYER* pl, float tm)
 // Player controls
 static void pl_control(PLAYER* pl)
 {
+    const float END_BORDER = 40.0f;
+
     pl->angleTarget = vec3(0,0,0);
     pl->target.y = 0.0f;
 
     VEC2 stick = vpad_get_stick();
-    if(fabs(stick.x)  > 0.1f)
+    if(!pl->outsideCamera)
     {
-        pl->angleTarget.y = stick.x * pl->angleMax.y;
-        pl->angleTarget.z = stick.x * pl->angleMax.z;
-    }
-    else if(fabs(pl->angle.z) > 0.001f)
-    {
-        pl->angleTarget.z = -2* (pl->angle.z / (M_PI/2))* pl->angleMax.z;
-    }
-    
-    if(fabs(stick.y)  > 0.1f)
-    {
-        pl->angleTarget.x = stick.y * pl->angleMax.x;
-        pl->target.y = pl->maxSpeed.y * stick.y;
-    }
-    else if(fabs(pl->angle.x) > 0.001f)
-    {
-        pl->angleTarget.x = -2* (pl->angle.x / (M_PI/2))* pl->angleMax.x;
+        if(fabs(stick.x)  > 0.1f)
+        {
+            pl->angleTarget.y = stick.x * pl->angleMax.y;
+            pl->angleTarget.z = stick.x * pl->angleMax.z;
+        }
+        else if(fabs(pl->angle.z) > 0.001f)
+        {
+            pl->angleTarget.z = -2* (pl->angle.z / (M_PI/2))* pl->angleMax.z;
+        }
+        
+        if(fabs(stick.y)  > 0.1f)
+        {
+            pl->angleTarget.x = stick.y * pl->angleMax.x;
+            pl->target.y = pl->maxSpeed.y * stick.y;
+        }
+        else if(fabs(pl->angle.x) > 0.001f)
+        {
+            pl->angleTarget.x = -2* (pl->angle.x / (M_PI/2))* pl->angleMax.x;
+        }
     }
 
     pl_limit_angle(pl);
 
     pl->target.x = sin(pl->angle.y) * pl->maxSpeed.x;
     pl->target.z = cos(pl->angle.y) * pl->maxSpeed.z;
+
+    if(!world_ended() && (pl->pos.z < -END_BORDER || pl->pos.z > END_BORDER || pl->pos.x < -END_BORDER || pl->pos.x > END_BORDER))
+    {
+        game_start_fading();
+    }
 
 }
 
@@ -272,6 +286,7 @@ PLAYER pl_create(VEC3 pos)
     pl.dir = (rand() % 2 == 0 ? 1.0f : -1.0f);
 
     pl.control = true;
+    pl.outsideCamera = false;
 
     return pl;
 }

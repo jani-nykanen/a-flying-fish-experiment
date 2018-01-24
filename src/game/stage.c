@@ -33,6 +33,12 @@ static DECORATION decorations[DEC_MAX];
 // Decoration count
 static int decCount;
 
+// Has the apocalypse begun
+static bool apocalypse;
+// Sky darkening timer
+static float skyDarkTimer;
+// Fence height
+static float fenceHeight;
 
 // Draw a floor tile (or piece of it)
 static void draw_floor_tile_small(float x, float y, float z, float w, float h, float u, float v, float uw, float vh)
@@ -146,6 +152,20 @@ static void draw_background(CAMERA* cam)
         draw_bitmap(bmpMoon,480+posx,10,0);
     }
 
+    // Darken the sky
+    if(skyDarkTimer > 0.0f)
+    {
+        if(skyDarkTimer < 120.0f)
+        {
+            int amount = (int)floor(skyDarkTimer / 120.0f * MAX_DARKNESS_VALUE);
+            darken_frame(amount);
+        }
+        else
+        {
+            clear_frame(0);
+        }
+    }
+
 }
 
 
@@ -231,6 +251,8 @@ static void draw_fence_plane_d(CAMERA* cam, float x,float y,float z, float w, fl
 // Draw fence
 static void draw_fence(CAMERA* cam, float x, float y, float z, float w, float h, float d, int repeat)
 {
+    if(h < 0.0f) return;
+
     bind_texture(bmpFence);
     int i = 0;
 
@@ -276,6 +298,9 @@ int init_stage(ASSET_PACK* ass)
 
     decCount = read_decoration_from_layout(ass,layout,decorations);
 
+    apocalypse = false;
+    fenceHeight = 5.0f;
+
     return 0;
 }
 
@@ -283,8 +308,50 @@ int init_stage(ASSET_PACK* ass)
 // Stage-player collision
 void stage_player_collision(PLAYER* pl, float tm)
 {
+    if(apocalypse) return;
+
     player_decoration_collision(pl,decorations,decCount);
     pl_fence_collision(pl,-1,-25,-25,25,25,0.0f,10.0f,tm);
+}
+
+
+// Update stage
+void update_stage(float tm)
+{
+    const float ULIMIT = -20.0f;
+
+    if(!apocalypse) return;
+
+    if(decCount == 0)
+    {
+        if(skyDarkTimer < 120.0f)
+        {
+            skyDarkTimer += 1.0f * tm;
+        }
+        else if(fenceHeight > 0.0f)
+        {
+            fenceHeight -= 0.02f *tm;
+        }
+
+        return;
+    }
+
+    float speed = 0.0f;
+    int i = 0;
+    int above = 0;
+    for(; i < decCount; ++ i)
+    {
+        speed = 0.1f + 0.01f * i;
+        decorations[i].pos.y -= speed * tm;
+        if(decorations[i].pos.y < ULIMIT)
+        {
+            ++ above;
+        }
+    }
+    if(above >= decCount)
+    {
+        decCount = 0;
+    }
 }
 
 
@@ -304,7 +371,20 @@ void draw_stage(CAMERA* cam)
     toggle_darkness(true);
     set_darkness(10.0f,35.0f);
 
-    draw_fence(cam,-25,5,-25,5.0f,5.0f,5.0f,10);
+    draw_fence(cam,-25,5,-25,5.0f,fenceHeight,5.0f,10);
 
     draw_models();
+}
+
+
+// Start the apocalypse 
+void end_stage()
+{
+    apocalypse = true;
+}
+
+// Has the stage ended & are the decorations gone
+bool world_ended()
+{
+    return decCount == 0 && apocalypse;
 }

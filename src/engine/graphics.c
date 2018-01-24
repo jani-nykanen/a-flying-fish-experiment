@@ -25,8 +25,6 @@ typedef struct
 }
 _TRIANGLE;
 
-// Max darkness value
-#define MAX_DARKNESS_VALUE 8
 
 // Min depth (default for near plane)
 static const float DEPTH_MIN = 0.025f;
@@ -597,7 +595,7 @@ void draw_text(BITMAP* b, Uint8* text, int len, int dx, int dy, int xoff, int yo
     int x = dx;
     int y = dy;
     int cw = b->w / 16;
-    int ch = b->h / 16;
+    int ch = cw; //  b->h / 16;
     int i=0;
     Uint8 c;
     int sx;
@@ -1139,4 +1137,18 @@ void set_near_far_planes(float near, float far)
 {
     nearPlane = near;
     farPlane = far;
+}
+
+
+// Darken the active frame
+void darken_frame(int amount)
+{
+    if(amount <= 0) return;
+    if(amount >= MAX_DARKNESS_VALUE) amount = MAX_DARKNESS_VALUE-1;
+
+    int i = 0;
+    for(; i < gframe->w*gframe->h; ++ i)
+    {
+        gframe->colorData[i] = lpalettes[amount][gframe->colorData[i]];
+    }
 }

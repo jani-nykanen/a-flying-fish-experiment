@@ -27,6 +27,7 @@ typedef struct
 
     float radius;
     bool control;
+    bool outsideCamera;
 
     float swimAngleMod;
     float swimAngleMod2;

@@ -30,9 +30,7 @@
 
 // Bitmap font
 static BITMAP* bmpFont;
-
-// FPS string
-static char fps[32];
+static BITMAP* bmpFontBig;
 
 // Game objects
 static PLAYER player;
@@ -41,6 +39,75 @@ static CAMERA cam;
 // Fish
 static PLAYER fish[MAX_FISH];
 static int fishCount;
+
+// Time
+static float timer;
+
+// Fading (aka darkening, actually)
+static float fadeTimer;
+static int fadeMode;
+
+// Fish apocalypse y timer
+static float fishApocTimer;
+
+
+// The title says it all
+static void make_fish_disappear(float tm)
+{
+    const float ULIMIT = -25.0f;
+
+    PLAYER* f;
+    int i = 0;
+    float angle;
+    int above = 0;
+    for(; i < fishCount; ++ i)
+    {
+        f = &fish[i];
+        angle = atan2(f->pos.z,f->pos.x);
+        f->speed.x -= cos(angle) * 0.05f * tm;
+        f->speed.z -= sin(angle) * 0.05f * tm;
+
+        if(fishApocTimer > 240.0f)
+        {
+            f->speed.y = 0.0f;
+            f->pos.y -= 0.05f * tm;
+        }
+
+
+        if(f->pos.y < ULIMIT)
+            ++ above;
+    }
+
+    if(above >= fishCount)
+    {
+        game_start_fading();
+    }
+
+    fishApocTimer += 1.0f * tm;
+}
+
+
+// Draw timer
+static void draw_timer()
+{
+    draw_text(bmpFont,(Uint8*)"TIME:",5,128,5,0,0,true);
+
+    int t = (int)floor(timer / 60.0f);
+
+    if(t < 0)
+    {
+        if((int)floor(timer/15) % 2 == 0 ) 
+            return;
+        else
+            t = 0;
+    }
+
+
+    char tstr[3];
+    snprintf(tstr,3,t < 10 ? "0%d" : "%d",t);
+
+    draw_text(bmpFontBig,(Uint8*)tstr,2,128,9,-10,0,true);
+}
 
 
 // Add NPC fish to the game
@@ -97,6 +164,7 @@ static int game_init()
 {
     ASSET_PACK* ass = get_global_assets();
     bmpFont = (BITMAP*)get_asset(ass,"font");
+    bmpFontBig = (BITMAP*)get_asset(ass,"fontBig");
 
     init_player(ass);
     if(init_stage(ass) == 1)
@@ -109,6 +177,12 @@ static int game_init()
     if(add_fish() == 1)
         return 1;
 
+    timer = 100.0f * 60.0f;
+
+    fadeTimer = 0.0f;
+    fadeMode = 0;
+    fishApocTimer = 0.0f;
+
     return 0;
 }
 
@@ -116,7 +190,7 @@ static int game_init()
 // Update game
 static void game_update(float tm)
 {
-    snprintf(fps,32,"FPS: %d",(int)round(60.0f / tm));
+    update_stage(tm);
 
     pl_update(&player,tm);
     stage_player_collision(&player,tm);
@@ -129,17 +203,43 @@ static void game_update(float tm)
     {
         pl_update(&fish[i],tm);
         stage_player_collision(&fish[i],tm);
-        player_to_player_collision(&player,&fish[i],tm);
-        for(i2 = 0; i2 < fishCount; ++ i2)
+
+        if(!world_ended())
         {
-            if(i != i2)
-                player_to_player_collision(&fish[i],&fish[i2],tm);
+            player_to_player_collision(&player,&fish[i],tm);
+            for(i2 = 0; i2 < fishCount; ++ i2)
+            {
+                if(i != i2)
+                    player_to_player_collision(&fish[i],&fish[i2],tm);
+            }
         }
     }
 
     if(get_key_state((int)SDL_SCANCODE_ESCAPE) == PRESSED)
     {
         if(ask_to_quit() == 1) app_terminate();
+    }
+
+    timer -= 1.0f * tm;
+    if(timer <= 0.0f)
+    {
+        end_stage();
+        if(world_ended())
+            make_fish_disappear(tm);
+    }
+
+    if(fadeMode != 0)
+    {
+        fadeTimer += 0.5f * fadeMode * tm;
+        if(fadeTimer >= 30.0f && fadeMode == 1)
+        {
+            if(world_ended())
+                app_terminate();
+
+            player.pos = vec3(0,0,0);
+            fadeMode = -1;
+            fadeTimer = 30.0f;
+        }
     }
 }
 
@@ -175,8 +275,15 @@ static void game_draw()
     tr_identity();
     draw_triangle_buffer();
 
-    draw_text(bmpFont,(Uint8*)fps,32,8,8,-1,0,false);
+    // Draw timer
+    draw_timer();
 
+    // Darken the frame
+    if(fadeMode != 0)
+    {
+        int amount = (int)floor(fadeTimer/30.0f * MAX_DARKNESS_VALUE);
+        darken_frame(amount);
+    }
 }
 
 
@@ -191,6 +298,16 @@ static void game_destroy()
 static void game_on_swap()
 {
 
+}
+
+
+// Start fading
+void game_start_fading()
+{
+    if(fadeMode == 1) return;
+
+    fadeMode = 1;
+    fadeTimer = 0.0f;
 }
 
 

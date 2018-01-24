@@ -11,6 +11,9 @@
 #include "vector.h"
 #include "mesh.h"
 
+// Max darkness value
+#define MAX_DARKNESS_VALUE 8
+
 /// Flipping enumerations
 enum
 {
@@ -238,5 +241,9 @@ void set_darkness(float min, float max);
 /// < near Near
 /// < far Far
 void set_near_far_planes(float near, float far);
+
+/// Darken the active frame
+/// < amount Amount 
+void darken_frame(int amount);
 
 #endif // __GRAPHICS__
