@@ -4,6 +4,9 @@
 @path assets/bitmaps/
 @type bitmap
 {
+    avatar avatar.png
+    creator creator.png
+
     font font.png
     fontBig font_big.png
     
@@ -33,6 +36,7 @@
 @path assets/models/
 @type mesh
 {
+    cube cube.obj
     fish fish.obj
     house house.obj
     fir fir.obj

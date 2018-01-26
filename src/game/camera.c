@@ -13,6 +13,9 @@
 #include "time.h"
 
 
+// Angle reached
+static bool angleReached;
+
 // Limit camera
 static void limit_camera(CAMERA* cam)
 {
@@ -34,6 +37,8 @@ static void limit_camera(CAMERA* cam)
 // Create camera
 CAMERA create_camera(VEC3 pos)
 {
+    angleReached = false;
+
     CAMERA cam;
     cam.pos = pos;
     cam.dist = 4.75f;
@@ -66,9 +71,30 @@ void cam_follow_player(CAMERA* cam, PLAYER* pl, float tm)
         cam->pos.y += (pl->pos.y - cam->pos.y) / 12.0f * tm;
     }    
 
-    float targetAngle = world_ended() ? (M_PI + atan2(cam->pos.x,cam->pos.z)) : pl->angle.y;
-
-    cam->angle.y += (targetAngle - cam->angle.y)/24.0f * tm;
+    float targetAngle;
+    if(world_ended())
+    {
+        targetAngle = (M_PI + atan2(cam->pos.x,cam->pos.z));
+        if(!angleReached)
+        {
+            cam->angle.y += (targetAngle - cam->angle.y)/24.0f * tm;
+            if(fabs(cam->angle.y-targetAngle) < 0.01f*tm)
+            {
+                angleReached = true;
+            }
+        }
+        else
+        {
+            cam->angle.y = targetAngle;
+        }
+        
+    }
+    else
+    {
+        targetAngle = pl->angle.y;
+        cam->angle.y += (targetAngle - cam->angle.y)/24.0f * tm;
+    }
+    
 
     cam->vpos.x = cam->pos.x - cos(cam->angle.y - M_PI/2.0f) * cam->dist;
     cam->vpos.y = cam->pos.y - 1.0f;

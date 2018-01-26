@@ -220,6 +220,11 @@ static void game_update(float tm)
         if(ask_to_quit() == 1) app_terminate();
     }
 
+    if(get_key_state((int)SDL_SCANCODE_F1) == PRESSED)
+    {
+        timer = 0.0f;
+    }
+
     timer -= 1.0f * tm;
     if(timer <= 0.0f)
     {
