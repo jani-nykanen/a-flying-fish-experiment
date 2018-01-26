@@ -15,6 +15,7 @@ typedef struct
     VEC3 vpos;
     float dist;
     VEC3 angle;
+    bool movedAround;
 }
 CAMERA;
 

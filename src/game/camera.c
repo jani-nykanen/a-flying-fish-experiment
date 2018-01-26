@@ -16,6 +16,7 @@
 // Angle reached
 static bool angleReached;
 
+
 // Limit camera
 static void limit_camera(CAMERA* cam)
 {
@@ -34,6 +35,19 @@ static void limit_camera(CAMERA* cam)
 }
 
 
+// Move around
+static void cam_move_around(CAMERA* cam, PLAYER*pl, float tm)
+{
+    cam->pos = pl->pos;
+    cam->angle.y += 0.025f * tm;
+    if(cam->angle.y >= M_PI*2)
+    {
+        cam->angle.y = 0.0f;
+        cam->movedAround = true;
+    }
+}
+
+
 // Create camera
 CAMERA create_camera(VEC3 pos)
 {
@@ -43,6 +57,7 @@ CAMERA create_camera(VEC3 pos)
     cam.pos = pos;
     cam.dist = 4.75f;
     cam.angle = vec3(0,0,0);
+    cam.movedAround = false;
     return cam;
 }
 
@@ -51,6 +66,12 @@ CAMERA create_camera(VEC3 pos)
 void cam_follow_player(CAMERA* cam, PLAYER* pl, float tm)
 {
     const float RESTRICT = 30.0f;
+
+    if(!cam->movedAround)
+    {
+        cam_move_around(cam,pl,tm);
+        return;
+    }
 
     if(!world_ended() && (pl->pos.z < -RESTRICT || pl->pos.z > RESTRICT || pl->pos.x < -RESTRICT || pl->pos.x > RESTRICT))
     {
@@ -94,11 +115,7 @@ void cam_follow_player(CAMERA* cam, PLAYER* pl, float tm)
         targetAngle = pl->angle.y;
         cam->angle.y += (targetAngle - cam->angle.y)/24.0f * tm;
     }
-    
 
-    cam->vpos.x = cam->pos.x - cos(cam->angle.y - M_PI/2.0f) * cam->dist;
-    cam->vpos.y = cam->pos.y - 1.0f;
-    cam->vpos.z = cam->pos.z + sin(cam->angle.y - M_PI/2.0f) * cam->dist;
 
     limit_camera(cam);
 }
@@ -107,6 +124,9 @@ void cam_follow_player(CAMERA* cam, PLAYER* pl, float tm)
 // Use camera
 void use_camera(CAMERA* cam)
 {
+    cam->vpos.x = cam->pos.x - cos(cam->angle.y - M_PI/2.0f) * cam->dist;
+    cam->vpos.y = cam->pos.y - 1.0f;
+    cam->vpos.z = cam->pos.z + sin(cam->angle.y - M_PI/2.0f) * cam->dist;
 
     tr_translate(-cam->vpos.x,-cam->vpos.y,-cam->vpos.z);
     tr_rotate_world(cam->angle.y,cam->angle.x);

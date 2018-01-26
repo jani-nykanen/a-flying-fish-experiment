@@ -457,7 +457,7 @@ void draw_bitmap_region(BITMAP* b, int sx, int sy, int sw, int sh, int dx, int d
     dx += transX;
     dy += transY;
 
-    if(dx+sw < 0 || dx >= gframe->w || dy + sh < 0 || dy >= sh) return;
+    if(dx+sw < 0 || dx >= gframe->w || dy + sh < 0 || dy-sh >= gframe->h) return;
 
     int x; // Screen X
     int y = dy; // Screen Y

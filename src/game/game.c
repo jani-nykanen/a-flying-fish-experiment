@@ -170,7 +170,7 @@ static int game_init()
     if(init_stage(ass) == 1)
         return 1;
 
-    player = pl_create(vec3(0.0f,0.0f,0.0f));
+    player = pl_create(vec3(0.0f,-3.0f,-35.0f));
     cam = create_camera(player.pos);
 
     fishCount = 0;
@@ -179,8 +179,8 @@ static int game_init()
 
     timer = 100.0f * 60.0f;
 
-    fadeTimer = 0.0f;
-    fadeMode = 0;
+    fadeTimer = 30.0f;
+    fadeMode = -1;
     fishApocTimer = 0.0f;
 
     return 0;
@@ -239,7 +239,7 @@ static void game_update(float tm)
         if(fadeTimer >= 30.0f && fadeMode == 1)
         {
             if(world_ended())
-                app_terminate();
+                app_swap_scene("intro");
 
             player.pos = vec3(0,0,0);
             fadeMode = -1;
