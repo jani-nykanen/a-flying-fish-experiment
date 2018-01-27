@@ -156,6 +156,13 @@ static void pl_control(PLAYER* pl)
 {
     const float END_BORDER = 40.0f;
 
+    if(!pl->canControl)
+    {
+        pl->target.x = sin(pl->angle.y) * pl->maxSpeed.x;
+        pl->target.z = cos(pl->angle.y) * pl->maxSpeed.z;
+        return;
+    }
+
     pl->angleTarget = vec3(0,0,0);
     pl->target.y = 0.0f;
 
@@ -287,6 +294,7 @@ PLAYER pl_create(VEC3 pos)
 
     pl.control = true;
     pl.outsideCamera = false;
+    pl.canControl = false;
 
     return pl;
 }

@@ -5,6 +5,7 @@
 
 #include "global.h"
 #include "game/game.h"
+#include "game/askquit.h"
 #include "intro/intro.h"
 
 #include "engine/app.h"
@@ -19,11 +20,12 @@ int main(int argc, char** argv)
 {
     // Set scenes
     SCENE scenes[] = {
-        get_global_scene(),  
+        get_global_scene(),
+        get_quit_scene(),  
         get_game_scene(),
-        get_intro_scene()
+        get_intro_scene(),
     };
-    int sceneCount = 3;
+    int sceneCount = 4;
 
     // Load config
     CONFIG c;

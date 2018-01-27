@@ -215,14 +215,10 @@ static void game_update(float tm)
         }
     }
 
-    if(get_key_state((int)SDL_SCANCODE_ESCAPE) == PRESSED)
+    if(vpad_get_button(0) == PRESSED || vpad_get_button(2) == PRESSED)
     {
-        if(ask_to_quit() == 1) app_terminate();
-    }
-
-    if(get_key_state((int)SDL_SCANCODE_F1) == PRESSED)
-    {
-        timer = 0.0f;
+        app_swap_scene("quit");
+        return;
     }
 
     timer -= 1.0f * tm;

@@ -11,6 +11,8 @@
 
 #include "../global.h"
 
+#include "math.h"
+
 // Phase
 static int phase;
 // Phase timer
@@ -117,7 +119,7 @@ static void intro_update(float tm)
         }
     }
 
-    
+    if(vpad_get_button(2) == PRESSED) app_terminate();
 }
 
 

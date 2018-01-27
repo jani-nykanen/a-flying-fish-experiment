@@ -44,6 +44,7 @@ static void cam_move_around(CAMERA* cam, PLAYER*pl, float tm)
     {
         cam->angle.y = 0.0f;
         cam->movedAround = true;
+        pl->canControl = true;
     }
 }
 

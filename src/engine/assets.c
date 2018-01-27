@@ -11,8 +11,6 @@
 #include "../lib/tmxc.h"
 
 #include "bitmap.h"
-#include "music.h"
-#include "sample.h"
 #include "mesh.h"
 
 /// Asset type enum
@@ -20,9 +18,7 @@ enum
 {
     T_BITMAP = 0,
     T_TILEMAP = 1,
-    T_MUSIC = 2,
-    T_SAMPLE = 3,
-    T_MESH = 4,
+    T_MESH = 2,
 };
 
 // Global file path
@@ -76,17 +72,9 @@ static void parse_command_type(char* w1, char* w2)
         {
             assetType = T_BITMAP;
         }
-        else if(strcmp(w2,"music") == 0)
-        {
-            assetType = T_MUSIC;
-        }
         else if(strcmp(w2,"tilemap") == 0)
         {
             assetType = T_TILEMAP;
-        }
-        else if(strcmp(w2,"sample") == 0)
-        {
-            assetType = T_SAMPLE;
         }
         else if(strcmp(w2,"mesh") == 0)
         {
@@ -177,14 +165,6 @@ ASSET_PACK* load_asset_pack(const char* path)
                 {
                     p->objects[index] = (ANY)load_tilemap(path);
                 }
-                else if(assetType == T_MUSIC)
-                {
-                    p->objects[index] = (ANY)load_music(path);
-                }
-                else if(assetType == T_SAMPLE)
-                {
-                    p->objects[index] = (ANY)load_sample(path);
-                }
                 else if(assetType == T_MESH)
                 {
                     p->objects[index] = (ANY)load_mesh(path);
@@ -237,12 +217,6 @@ void destroy_asset_pack(ASSET_PACK* p)
         {
         case T_BITMAP:
             destroy_bitmap((BITMAP*)obj);
-            break;
-        case T_MUSIC:
-            destroy_music((MUSIC*)obj);
-            break;
-        case T_SAMPLE:
-            destroy_sample((SAMPLE*)obj);
             break;
         case T_TILEMAP:
             destroy_tilemap((TILEMAP*)obj);
