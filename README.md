@@ -1,4 +1,4 @@
-[Play on itch.io] (https://jani-nykanen.itch.io/a-flying-fish-experiment)
+[Play on itch.io](https://jani-nykanen.itch.io/a-flying-fish-experiment)
 
 ------
 
